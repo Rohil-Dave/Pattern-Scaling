@@ -17,10 +17,13 @@ from matplotlib.patches import PathPatch
 # al: armhole length (calculated from pattern width and collar width)
 # bx: B5 straight line extent x-coordinate
 # by: B5 straight line extent y-coordinate
+# bn1: first center back notches distance
+# bn2: second center back notches distance
+
 
 
 # Define the pattern drawing function
-def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh, bx, by):
+def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh, bx, by, bn1, bn2):
 
 
     # Create a figure and an axis
@@ -63,9 +66,9 @@ def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh, bx, by):
     B5_left_path = Path(B5_left_vertices, B5headcodes)
     B5_right_path = Path(B5_right_vertices, B5headcodes)
 
-    B5_left_curve = PathPatch(B5_left_path, fc="none", lw=1, edgecolor='r')
+    B5_left_curve = PathPatch(B5_left_path, fc="none", lw=1, edgecolor='b')
     ax.add_patch(B5_left_curve)
-    B5_right_curve = PathPatch(B5_right_path, fc="none", lw=1, edgecolor='r')
+    B5_right_curve = PathPatch(B5_right_path, fc="none", lw=1, edgecolor='b')
     ax.add_patch(B5_right_curve)
 
     # Simple box B5 pieces
@@ -90,9 +93,9 @@ def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh, bx, by):
     sleeveheadpath1 = Path(sleeve1_vertices, sleeveheadcodes)
     sleeveheadpath2 = Path(sleeve2_vertices, sleeveheadcodes)
 
-    sleeveline1 = PathPatch(sleeveheadpath1, fc="none", lw=1, edgecolor='r')
+    sleeveline1 = PathPatch(sleeveheadpath1, fc="none", lw=1, edgecolor='b')
     ax.add_patch(sleeveline1)
-    sleeveline2 = PathPatch(sleeveheadpath2, fc="none", lw=1, edgecolor='r')
+    sleeveline2 = PathPatch(sleeveheadpath2, fc="none", lw=1, edgecolor='b')
     ax.add_patch(sleeveline2)
 
 
@@ -115,10 +118,15 @@ def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh, bx, by):
 
     # Dashed lines showing piece shape details or fold lines or sewing lines
     # Draw dashed line on fold in center
-    ax.plot([0.5*pw, 0.5*pw], [0, ph - cl], color='b', lw=1, linestyle='dashed')
+    ax.plot([0.5*pw, 0.5*pw], [0, ph - cl], color='k', lw=1, linestyle='dashed')
     # Draw dashed lines to show sleevehead area
-    ax.plot([cw + sh, 0.5*pw - cw - sh], [ph - cl, ph - cl], color='b', lw=1, linestyle='dashed')
-    ax.plot([0.5*pw + cw + sh, pw - cw - sh], [ph - cl, ph - cl], color='b', lw=1, linestyle='dashed')
+    ax.plot([cw + sh, 0.5*pw - cw - sh], [ph - cl, ph - cl], color='k', lw=1, linestyle='dashed')
+    ax.plot([0.5*pw + cw + sh, pw - cw - sh], [ph - cl, ph - cl], color='k', lw=1, linestyle='dashed')
+    # Draw dashed lines to show center back notches
+    ax.plot([0.5*pw - bn1, 0.5*pw - bn1], [ph - cl - 14, ph - cl], color='k', lw=1, linestyle='dashed') # 14 is stitch length from ZWP by BH, may adjust as desired
+    ax.plot([0.5*pw + bn1, 0.5*pw + bn1], [ph - cl - 14, ph - cl], color='k', lw=1, linestyle='dashed') # 14 is stitch length from ZWP by BH, may adjust as desired
+    ax.plot([0.5*pw - bn1 - bn2, 0.5*pw - bn1 - bn2], [ph - cl - 1, ph - cl], color='k', lw=1, linestyle='dashed') # 2 show just a notch
+    ax.plot([0.5*pw + bn1 + bn2, 0.5*pw + bn1 + bn2], [ph - cl - 1, ph - cl], color='k', lw=1, linestyle='dashed') # 2 show just a notch
 
 
     # Setting limits
@@ -130,4 +138,4 @@ def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh, bx, by):
     plt.show()
 
 
-draw_tee_pattern(pw=140, ph=90, cw=9.5, cl=25, sd=3, sh=15, bw=14, bh=14, bx=6, by=6)
+draw_tee_pattern(pw=140, ph=90, cw=9.5, cl=25, sd=3, sh=15, bw=14, bh=14, bx=6, by=6, bn1=9.5, bn2=4.5)
