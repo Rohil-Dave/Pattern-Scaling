@@ -40,6 +40,8 @@ def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh, bx, by):
     collar_piece3 = Rectangle((pw - cw, ph - cl), width=cw, height=cl, linewidth=1, edgecolor='b', facecolor='none')
     ax.add_patch(collar_piece3)
 
+
+
     # Draw B5 areas, for necklines, and for usage as back neck facing or pockets, etc.
     # Construct B5 straight lines in x direction (width)
     ax.plot([0, bx], [ph - cl - bh, ph - cl - bh], color='r', lw=1)
@@ -48,24 +50,43 @@ def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh, bx, by):
     ax.plot([bw, bw], [ph - cl, ph - cl - by], color='r', lw=1)
     ax.plot([pw - bw, pw - bw], [ph - cl, ph - cl - by], color='r', lw=1)
 
+    B5_left_start = (bx, ph - cl - bh)
+    B5_left_control = (bw, ph - cl - bh)   
+    B5_left_end = (bw, ph - cl - by)
+    B5_left_vertices = [B5_left_start, B5_left_control, B5_left_end]
+    B5_right_start = (pw - bx, ph - cl - bh)
+    B5_right_control = (pw - bw, ph - cl - bh)
+    B5_right_end = (pw - bw, ph - cl - by)
+    B5_right_vertices = [B5_right_start, B5_right_control, B5_right_end]
+    B5headcodes = [Path.MOVETO, Path.CURVE3, Path.CURVE3]
 
-    b5_piece1 = Rectangle((0, ph - cl - bh), width=bw, height=bh, linewidth=1, edgecolor='b', facecolor='none')
-    ax.add_patch(b5_piece1)
-    b5_piece2 = Rectangle((pw - bw, ph - cl - bh), width=bw, height=bh, linewidth=1, edgecolor='b', facecolor='none')
-    ax.add_patch(b5_piece2)
+    B5_left_path = Path(B5_left_vertices, B5headcodes)
+    B5_right_path = Path(B5_right_vertices, B5headcodes)
+
+    B5_left_curve = PathPatch(B5_left_path, fc="none", lw=1, edgecolor='r')
+    ax.add_patch(B5_left_curve)
+    B5_right_curve = PathPatch(B5_right_path, fc="none", lw=1, edgecolor='r')
+    ax.add_patch(B5_right_curve)
+
+    # Simple box B5 pieces
+    # b5_piece1 = Rectangle((0, ph - cl - bh), width=bw, height=bh, linewidth=1, edgecolor='b', facecolor='none')
+    # ax.add_patch(b5_piece1)
+    # b5_piece2 = Rectangle((pw - bw, ph - cl - bh), width=bw, height=bh, linewidth=1, edgecolor='b', facecolor='none')
+    # ax.add_patch(b5_piece2)
+
+
 
     # Draw sleevehead lines
     sleeve1_start = (cw + sh, ph - cl)
     control_midpoint1 = (0.25*pw, ph - cl - 2*sd)   # sd is doubled show sleevehead connection to armhole, may need to adjust
     sleeve1_end = (0.5*pw - cw - sh, ph - cl)
-
+    sleeve1_vertices = [sleeve1_start, control_midpoint1, sleeve1_end]
     sleeve2_start = (0.5*pw + cw + sh, ph - cl)
     control_midpoint2 = (0.75*pw, ph - cl - 2*sd)   # sd is doubled show sleevehead connection to armhole, may need to adjust
     sleeve2_end = (pw - cw - sh, ph - cl)
-
-    sleeveheadcodes = [Path.MOVETO, Path.CURVE3, Path.CURVE3]
-    sleeve1_vertices = [sleeve1_start, control_midpoint1, sleeve1_end]
     sleeve2_vertices = [sleeve2_start, control_midpoint2, sleeve2_end]
+    sleeveheadcodes = [Path.MOVETO, Path.CURVE3, Path.CURVE3]
+    
     sleeveheadpath1 = Path(sleeve1_vertices, sleeveheadcodes)
     sleeveheadpath2 = Path(sleeve2_vertices, sleeveheadcodes)
 
@@ -74,6 +95,8 @@ def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh, bx, by):
     sleeveline2 = PathPatch(sleeveheadpath2, fc="none", lw=1, edgecolor='b')
     ax.add_patch(sleeveline2)
 
+
+
     # Draw lines connecting sleevehead lines to collar pieces, on pattern from left to right
     # Sample: ax.plot([x1, x2], [y1, y2], color='r')
     ax.plot([cw, cw + sh], [ph - cl, ph - cl], color='r', lw=1)
@@ -81,18 +104,22 @@ def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh, bx, by):
     ax.plot([0.5*pw + cw, 0.5*pw + cw + sh], [ph - cl, ph - cl], color='r', lw=1)
     ax.plot([pw - cw, pw - cw - sh], [ph - cl, ph - cl], color='r', lw=1)
 
+
+
     # Draw armhole lines
     al = 0.5*(0.5*pw - 2*cw)
     ax.plot([0.25*pw, 0.25*pw], [ph - cl - sd, ph - cl - sd - al], color='g', lw=1)
     ax.plot([0.75*pw, 0.75*pw], [ph - cl - sd, ph - cl - sd - al], color='g', lw=1)
 
+
+
     # Setting limits
     ax.set_xlim(-10, 160)
-    ax.set_ylim(-10, 100)
+    ax.set_ylim(-10, 120)
     ax.set_aspect('equal')
     ax.axis('on')  # Change to off to hide axis
     
     plt.show()
 
 
-draw_tee_pattern(pw=140, ph=90, cw=9.5, cl=25, sd=3, sh=15, bw=14, bh=14, bx=10, by=6)
+draw_tee_pattern(pw=140, ph=90, cw=9.5, cl=25, sd=3, sh=15, bw=14, bh=14, bx=6, by=6)
