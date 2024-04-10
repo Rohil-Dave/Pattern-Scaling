@@ -64,13 +64,18 @@ def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh):
     sleeveline2 = PathPatch(sleeveheadpath2, fc="none", lw=1, edgecolor='b')
     ax.add_patch(sleeveline2)
 
-    # Draw 
+    # Draw lines connecting sleevehead lines to collar pieces, on pattern from left to right
+    # Sample: ax.plot([x1, x2], [y1, y2], color='r')
+    ax.plot([cw, cw + sh], [ph - cl, ph - cl], color='r', lw=1)
+    ax.plot([0.5*pw - cw - sh, 0.5*pw - cw], [ph - cl, ph - cl], color='r', lw=1)
+    ax.plot([0.5*pw + cw, 0.5*pw + cw + sh], [ph - cl, ph - cl], color='r', lw=1)
+    ax.plot([pw - cw, pw - cw - sh], [ph - cl, ph - cl], color='r', lw=1)
 
     # Setting limits
     ax.set_xlim(-10, 160)
     ax.set_ylim(-10, 100)
     ax.set_aspect('equal')
-    ax.axis('on')  
+    ax.axis('on')  # Change to off to hide axis
     
     plt.show()
 
