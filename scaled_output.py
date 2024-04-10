@@ -28,7 +28,6 @@ def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh):
     main_body = Rectangle((0, 0), width=pw, height=ph, linewidth=1, edgecolor='b', facecolor='none')
     ax.add_patch(main_body)
 
-
     # Draw collar areas; collar is split into 4 pieces
     collar_piece1 = Rectangle((0, ph - cl), width=cw, height=cl, linewidth=1, edgecolor='b', facecolor='none')
     ax.add_patch(collar_piece1)
@@ -47,11 +46,11 @@ def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh):
 
     # Draw sleevehead lines
     start_point1 = (cw + sh, ph - cl)
-    control_midpoint1 = (0.25*pw, ph - cl - 2*sd)
+    control_midpoint1 = (0.25*pw, ph - cl - 2*sd)   # sd is doubled show sleevehead connection to armhole, may need to adjust
     end_point1 = (0.5*pw - cw - sh, ph - cl)
 
     start_point2 = (0.5*pw + cw + sh, ph - cl)
-    control_midpoint2 = (0.75*pw, ph - cl - 2*sd)
+    control_midpoint2 = (0.75*pw, ph - cl - 2*sd)   # sd is doubled show sleevehead connection to armhole, may need to adjust
     end_point2 = (pw - cw - sh, ph - cl)
 
     codes = [Path.MOVETO, Path.CURVE3, Path.CURVE3]
