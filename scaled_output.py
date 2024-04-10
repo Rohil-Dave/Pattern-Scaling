@@ -12,9 +12,12 @@ from matplotlib.patches import PathPatch
 # cl: collar length
 # sd: sleevehead depth
 # sh: sleevehead indent
+# bw: B5 width
+# bh: B5 height
+
 
 # Define the pattern drawing function
-def draw_tee_pattern(pw, ph, cw, cl, sd, sh):
+def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh):
 
 
     # Create a figure and an axis
@@ -28,16 +31,20 @@ def draw_tee_pattern(pw, ph, cw, cl, sd, sh):
     # Draw collar areas; collar is split into 4 pieces
     collar_piece1 = Rectangle((0, ph - cl), width=cw, height=cl, linewidth=1, edgecolor='b', facecolor='none')
     ax.add_patch(collar_piece1)
-    collar_piece2 = Rectangle(((pw/2) - cw, ph - cl), width=cw, height=cl, linewidth=1, edgecolor='b', facecolor='none')
+    collar_piece2 = Rectangle((0.5*pw - cw, ph - cl), width=cw, height=cl, linewidth=1, edgecolor='b', facecolor='none')
     ax.add_patch(collar_piece2)
-    collar_piece3 = Rectangle(((pw/2), ph - cl), width=cw, height=cl, linewidth=1, edgecolor='b', facecolor='none')
+    collar_piece3 = Rectangle((0.5*pw, ph - cl), width=cw, height=cl, linewidth=1, edgecolor='b', facecolor='none')
     ax.add_patch(collar_piece3)
     collar_piece3 = Rectangle((pw - cw, ph - cl), width=cw, height=cl, linewidth=1, edgecolor='b', facecolor='none')
     ax.add_patch(collar_piece3)
 
+    # Draw B5 areas, for necklines, and for usage as back neck facing or pockets, etc.
+    b5_piece1 = Rectangle((0, ph - cl - bh), width=bw, height=bh, linewidth=1, edgecolor='b', facecolor='none')
+    ax.add_patch(b5_piece1)
+    b5_piece2 = Rectangle((pw - bw, ph - cl - bh), width=bw, height=bh, linewidth=1, edgecolor='b', facecolor='none')
+    ax.add_patch(b5_piece2)
 
-
-    # Draw neckline
+    # Draw sleevehead lines
     start_point1 = (cw + sh, ph - cl)
     control_midpoint1 = (0.25*pw, ph - cl - sd)
     end_point1 = (0.5*pw - cw - sh, ph - cl)
@@ -68,4 +75,4 @@ def draw_tee_pattern(pw, ph, cw, cl, sd, sh):
     plt.show()
 
 
-draw_tee_pattern(pw=140, ph=90, cw=9.5, cl=25, sd=3, sh=5)
+draw_tee_pattern(pw=140, ph=90, cw=9.5, cl=25, sd=3, sh=8, bw=14, bh=14)
