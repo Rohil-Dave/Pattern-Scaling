@@ -104,18 +104,12 @@ def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh, bx, by):
     ax.plot([0.5*pw + cw, 0.5*pw + cw + sh], [ph - cl, ph - cl], color='b', lw=1)
     ax.plot([pw - cw, pw - cw - sh], [ph - cl, ph - cl], color='b', lw=1)
 
-    # Draw dashed lines to show sleevehead area
-    ax.plot([cw + sh, 0.5*pw - cw - sh], [ph - cl, ph - cl], color='b', lw=1, linestyle='dashed')
-    ax.plot([0.5*pw + cw + sh, pw - cw - sh], [ph - cl, ph - cl], color='b', lw=1, linestyle='dashed')
-
+    
 
     # Draw armhole lines
     al = 0.5*(0.5*pw - 2*cw)
     ax.plot([0.25*pw, 0.25*pw], [ph - cl - sd, ph - cl - sd - al], color='b', lw=1)
     ax.plot([0.75*pw, 0.75*pw], [ph - cl - sd, ph - cl - sd - al], color='b', lw=1)
-
-
-    # Draw
 
 
     # Setting limits
