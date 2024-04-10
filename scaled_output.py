@@ -47,11 +47,11 @@ def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh):
 
     # Draw sleevehead lines
     start_point1 = (cw + sh, ph - cl)
-    control_midpoint1 = (0.25*pw, ph - cl - sd)
+    control_midpoint1 = (0.25*pw, ph - cl - 2*sd)
     end_point1 = (0.5*pw - cw - sh, ph - cl)
 
     start_point2 = (0.5*pw + cw + sh, ph - cl)
-    control_midpoint2 = (0.75*pw, ph - cl - sd)
+    control_midpoint2 = (0.75*pw, ph - cl - 2*sd)
     end_point2 = (pw - cw - sh, ph - cl)
 
     codes = [Path.MOVETO, Path.CURVE3, Path.CURVE3]
