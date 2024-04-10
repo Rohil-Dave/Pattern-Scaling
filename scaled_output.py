@@ -11,9 +11,10 @@ from matplotlib.patches import PathPatch
 # cw: collar width
 # cl: collar length
 # sd: sleevehead depth
+# sh: sleevehead indent
 
 # Define the pattern drawing function
-def draw_tee_pattern(pw, ph, cw, cl, sd):
+def draw_tee_pattern(pw, ph, cw, cl, sd, sh):
 
 
     # Create a figure and an axis
@@ -37,13 +38,13 @@ def draw_tee_pattern(pw, ph, cw, cl, sd):
 
 
     # Draw neckline
-    start_point1 = (cw, ph - cl)
+    start_point1 = (cw + sh, ph - cl)
     control_midpoint1 = (0.25*pw, ph - cl - sd)
-    end_point1 = (0.5*pw - cw, ph - cl)
+    end_point1 = (0.5*pw - cw - sh, ph - cl)
 
-    start_point2 = (0.5*pw + cw, ph - cl)
+    start_point2 = (0.5*pw + cw + sh, ph - cl)
     control_midpoint2 = (0.75*pw, ph - cl - sd)
-    end_point2 = (pw - cw, ph - cl)
+    end_point2 = (pw - cw - sh, ph - cl)
 
     codes = [Path.MOVETO, Path.CURVE3, Path.CURVE3]
     vertices1 = [start_point1, control_midpoint1, end_point1]
@@ -56,13 +57,15 @@ def draw_tee_pattern(pw, ph, cw, cl, sd):
     sleeveline2 = PathPatch(sleeveheadpath2, fc="none", lw=1, edgecolor='b')
     ax.add_patch(sleeveline2)
 
+    # Draw 
 
+    # Setting limits
     ax.set_xlim(-10, 160)
     ax.set_ylim(-10, 100)
     ax.set_aspect('equal')
-    ax.axis('on')
+    ax.axis('on')  
     
     plt.show()
 
 
-draw_tee_pattern(pw=140, ph=90, cw=9.5, cl=25, sd=3)
+draw_tee_pattern(pw=140, ph=90, cw=9.5, cl=25, sd=3, sh=5)
