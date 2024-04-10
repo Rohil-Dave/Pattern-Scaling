@@ -15,10 +15,12 @@ from matplotlib.patches import PathPatch
 # bw: B5 width
 # bh: B5 height
 # al: armhole length (calculated from pattern width and collar width)
+# bx: B5 straight line extent x-coordinate
+# by: B5 straight line extent y-coordinate
 
 
 # Define the pattern drawing function
-def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh):
+def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh, bx, by):
 
 
     # Create a figure and an axis
@@ -39,25 +41,33 @@ def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh):
     ax.add_patch(collar_piece3)
 
     # Draw B5 areas, for necklines, and for usage as back neck facing or pockets, etc.
+    # Construct B5 straight lines in x direction (width)
+    ax.plot([0, bx], [ph - cl - bh, ph - cl - bh], color='r', lw=1)
+    ax.plot([pw - bx, pw], [ph - cl - bh, ph - cl - bh], color='r', lw=1)
+    # Construct B5 straight lines in y direction (length/height)
+    ax.plot([bw, bw], [ph - cl, ph - cl - by], color='r', lw=1)
+    ax.plot([pw - bw, pw - bw], [ph - cl, ph - cl - by], color='r', lw=1)
+
+
     b5_piece1 = Rectangle((0, ph - cl - bh), width=bw, height=bh, linewidth=1, edgecolor='b', facecolor='none')
     ax.add_patch(b5_piece1)
     b5_piece2 = Rectangle((pw - bw, ph - cl - bh), width=bw, height=bh, linewidth=1, edgecolor='b', facecolor='none')
     ax.add_patch(b5_piece2)
 
     # Draw sleevehead lines
-    start_point1 = (cw + sh, ph - cl)
+    sleeve1_start = (cw + sh, ph - cl)
     control_midpoint1 = (0.25*pw, ph - cl - 2*sd)   # sd is doubled show sleevehead connection to armhole, may need to adjust
-    end_point1 = (0.5*pw - cw - sh, ph - cl)
+    sleeve1_end = (0.5*pw - cw - sh, ph - cl)
 
-    start_point2 = (0.5*pw + cw + sh, ph - cl)
+    sleeve2_start = (0.5*pw + cw + sh, ph - cl)
     control_midpoint2 = (0.75*pw, ph - cl - 2*sd)   # sd is doubled show sleevehead connection to armhole, may need to adjust
-    end_point2 = (pw - cw - sh, ph - cl)
+    sleeve2_end = (pw - cw - sh, ph - cl)
 
-    codes = [Path.MOVETO, Path.CURVE3, Path.CURVE3]
-    vertices1 = [start_point1, control_midpoint1, end_point1]
-    vertices2 = [start_point2, control_midpoint2, end_point2]
-    sleeveheadpath1 = Path(vertices1, codes)
-    sleeveheadpath2 = Path(vertices2, codes)
+    sleeveheadcodes = [Path.MOVETO, Path.CURVE3, Path.CURVE3]
+    sleeve1_vertices = [sleeve1_start, control_midpoint1, sleeve1_end]
+    sleeve2_vertices = [sleeve2_start, control_midpoint2, sleeve2_end]
+    sleeveheadpath1 = Path(sleeve1_vertices, sleeveheadcodes)
+    sleeveheadpath2 = Path(sleeve2_vertices, sleeveheadcodes)
 
     sleeveline1 = PathPatch(sleeveheadpath1, fc="none", lw=1, edgecolor='b')
     ax.add_patch(sleeveline1)
@@ -85,4 +95,4 @@ def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh):
     plt.show()
 
 
-draw_tee_pattern(pw=140, ph=90, cw=9.5, cl=25, sd=3, sh=8, bw=14, bh=14)
+draw_tee_pattern(pw=140, ph=90, cw=9.5, cl=25, sd=3, sh=15, bw=14, bh=14, bx=10, by=6)
