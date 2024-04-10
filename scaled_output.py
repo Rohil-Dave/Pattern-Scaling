@@ -14,6 +14,7 @@ from matplotlib.patches import PathPatch
 # sh: sleevehead indent
 # bw: B5 width
 # bh: B5 height
+# al: armhole length (calculated from pattern width and collar width)
 
 
 # Define the pattern drawing function
@@ -70,6 +71,11 @@ def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh):
     ax.plot([0.5*pw - cw - sh, 0.5*pw - cw], [ph - cl, ph - cl], color='r', lw=1)
     ax.plot([0.5*pw + cw, 0.5*pw + cw + sh], [ph - cl, ph - cl], color='r', lw=1)
     ax.plot([pw - cw, pw - cw - sh], [ph - cl, ph - cl], color='r', lw=1)
+
+    # Draw armhole lines
+    al = 0.5*(0.5*pw - 2*cw)
+    ax.plot([0.25*pw, 0.25*pw], [ph - cl - sd, ph - cl - sd - al], color='g', lw=1)
+    ax.plot([0.75*pw, 0.75*pw], [ph - cl - sd, ph - cl - sd - al], color='g', lw=1)
 
     # Setting limits
     ax.set_xlim(-10, 160)
