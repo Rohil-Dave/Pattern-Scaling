@@ -1,16 +1,21 @@
 #import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
-from matplotlib.patches import Arc
+#from matplotlib.patches import Arc
+from matplotlib.path import Path
+from matplotlib.patches import PathPatch
 
 # Input variables key:
 # pw: pattern width
 # ph: pattern height
 # cw: collar width
 # cl: collar length
+# nd: neckline drop
 
 # Define the pattern drawing function
-def draw_tee_pattern(pw, ph, cw, cl):
+def draw_tee_pattern(pw, ph, cw, cl, nd):
+
+
     # Create a figure and an axis
     fig, ax = plt.subplots(figsize=(10, 5))
 
@@ -29,10 +34,27 @@ def draw_tee_pattern(pw, ph, cw, cl):
     collar_piece3 = Rectangle((pw - cw, ph - cl), width=cw, height=cl, linewidth=1, edgecolor='b', facecolor='none')
     ax.add_patch(collar_piece3)
 
+
+
     # Draw neckline
-    ax.plot([0,pw], [ph - cl, ph - cl], linewidth=1, color='b')
-    neckline_arc1 = Arc((20, 100), width=40, height=20, angle=0, theta1=0, theta2=180, linewidth=1, edgecolor='b')
-    ax.add_patch(neckline_arc1)
+    start_point1 = (cw, ph - cl)
+    control_midpoint1 = (0.25*pw, ph - cl - nd)
+    end_point1 = (0.5*pw - cw, ph - cl)
+
+    start_point2 = (0.5*pw + cw, ph - cl)
+    control_midpoint2 = (0.75*pw, ph - cl - nd)
+    end_point2 = (pw - cw, ph - cl)
+
+    codes = [Path.MOVETO, Path.CURVE3, Path.CURVE3]
+    vertices1 = [start_point1, control_midpoint1, end_point1]
+    vertices2 = [start_point2, control_midpoint2, end_point2]
+    neckpath1 = Path(vertices1, codes)
+    neckpath2 = Path(vertices2, codes)
+
+    neckline1 = PathPatch(neckpath1, fc="none", lw=1, edgecolor='b')
+    ax.add_patch(neckline1)
+    neckline2 = PathPatch(neckpath2, fc="none", lw=1, edgecolor='b')
+    ax.add_patch(neckline2)
 
 
     ax.set_xlim(-10, 160)
@@ -43,4 +65,4 @@ def draw_tee_pattern(pw, ph, cw, cl):
     plt.show()
 
 
-draw_tee_pattern(pw=140, ph=90, cw=9.5, cl=25)
+draw_tee_pattern(pw=140, ph=90, cw=9.5, cl=25, nd=3)
