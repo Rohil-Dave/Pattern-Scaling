@@ -17,13 +17,17 @@ from matplotlib.patches import PathPatch
 # al: armhole length (calculated from pattern width and collar width)
 # bx: B5 straight line extent x-coordinate
 # by: B5 straight line extent y-coordinate
+
 # bn1: first center back notches distance
 # bn2: second center back notches distance
+# fn1: first center front notches distance
+# fn2: second center front notches distance
+# fn3: third center front notches distance
 
 
 
 # Define the pattern drawing function
-def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh, bx, by, bn1, bn2):
+def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh, bx, by, bn1, bn2, fn1, fn2, fn3):
 
 
     # Create a figure and an axis
@@ -118,16 +122,22 @@ def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh, bx, by, bn1, bn2):
 
     # Dashed lines showing piece shape details or fold lines or sewing lines
     # Draw dashed line on fold in center
-    ax.plot([0.5*pw, 0.5*pw], [0, ph - cl], color='k', lw=1, linestyle='dashed')
+    ax.plot([0.5*pw, 0.5*pw], [0, ph - cl], color='k', lw=1, linestyle='dashdot')
     # Draw dashed lines to show sleevehead area
-    ax.plot([cw + sh, 0.5*pw - cw - sh], [ph - cl, ph - cl], color='k', lw=1, linestyle='dashed')
-    ax.plot([0.5*pw + cw + sh, pw - cw - sh], [ph - cl, ph - cl], color='k', lw=1, linestyle='dashed')
-    # Draw dashed lines to show center back notches
-    ax.plot([0.5*pw - bn1, 0.5*pw - bn1], [ph - cl - 14, ph - cl], color='k', lw=1, linestyle='dashed') # 14 is stitch length from ZWP by BH, may adjust as desired
-    ax.plot([0.5*pw + bn1, 0.5*pw + bn1], [ph - cl - 14, ph - cl], color='k', lw=1, linestyle='dashed') # 14 is stitch length from ZWP by BH, may adjust as desired
-    ax.plot([0.5*pw - bn1 - bn2, 0.5*pw - bn1 - bn2], [ph - cl - 1, ph - cl], color='k', lw=1, linestyle='dashed') # 2 show just a notch
-    ax.plot([0.5*pw + bn1 + bn2, 0.5*pw + bn1 + bn2], [ph - cl - 1, ph - cl], color='k', lw=1, linestyle='dashed') # 2 show just a notch
-
+    ax.plot([cw + sh, 0.5*pw - cw - sh], [ph - cl, ph - cl], color='b', lw=1, linestyle='dashed')
+    ax.plot([0.5*pw + cw + sh, pw - cw - sh], [ph - cl, ph - cl], color='b', lw=1, linestyle='dashed')
+    # Draw dashed lines to show center back notches and associated sew lengths
+    ax.plot([0.5*pw - bn1, 0.5*pw - bn1], [ph - cl - 14, ph - cl], color='k', lw=1, linestyle='dashdot') # 14 is stitch length from ZWP by BH, may adjust as desired
+    ax.plot([0.5*pw + bn1, 0.5*pw + bn1], [ph - cl - 14, ph - cl], color='k', lw=1, linestyle='dashdot') # 14 is stitch length from ZWP by BH, may adjust as desired
+    ax.plot([0.5*pw - bn1 - bn2, 0.5*pw - bn1 - bn2], [ph - cl - 1, ph - cl], color='k', lw=1.5, linestyle='dashdot') # -1 to show just a notch
+    ax.plot([0.5*pw + bn1 + bn2, 0.5*pw + bn1 + bn2], [ph - cl - 1, ph - cl], color='k', lw=1.5, linestyle='dashdot') # -1 to show just a notch
+    # Draw dashed lines to show center front notches
+    ax.plot([fn1, fn1], [ph - cl - bh, 0], color='k', lw=1, linestyle='dashdot')
+    ax.plot([pw - fn1, pw - fn1], [ph - cl - bh, 0], color='k', lw=1, linestyle='dashdot')
+    ax.plot([fn1 + fn2, fn1 + fn2], [ph - cl - bh, 0], color='k', lw=1, linestyle='dashdot')
+    ax.plot([pw - fn1 - fn2, pw - fn1 -fn2], [ph - cl - bh, 0], color='k', lw=1, linestyle='dashdot')
+    ax.plot([fn1 + fn2 + fn3, fn1 + fn2 + fn3], [ph - cl - bh - 1, ph - cl - bh], color='k', lw=1.5, linestyle='dashdot')
+    ax.plot([pw - fn1 - fn2 - fn3, pw - fn1 - fn2 - fn3], [ph - cl - bh - 1, ph - cl - bh], color='k', lw=1.5, linestyle='dashdot')
 
     # Setting limits
     ax.set_xlim(-10, 150)
@@ -138,4 +148,4 @@ def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh, bx, by, bn1, bn2):
     plt.show()
 
 
-draw_tee_pattern(pw=140, ph=90, cw=9.5, cl=25, sd=3, sh=15, bw=14, bh=14, bx=6, by=6, bn1=9.5, bn2=4.5)
+draw_tee_pattern(pw=140, ph=90, cw=9.5, cl=25, sd=3, sh=15, bw=14, bh=14, bx=6, by=6, bn1=9.5, bn2=4.5, fn1=2.5, fn2=3, fn3=3)
