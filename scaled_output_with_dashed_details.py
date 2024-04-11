@@ -122,22 +122,31 @@ def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh, bx, by, bn1, bn2, fn1, fn2,
 
     # Dashed lines showing piece shape details or fold lines or sewing lines
     # Draw dashed line on fold in center
-    ax.plot([0.5*pw, 0.5*pw], [0, ph - cl], color='k', lw=1, linestyle='dashdot')
+    ax.plot([0.5*pw, 0.5*pw], [0, ph - cl], color='k', lw=1, linestyle='dashed')
+    ax.plot([0.5*pw, 0.5*pw], [ph - cl - 1, ph - cl], color='k', lw=1.5, linestyle='solid') # to emphasize notch
     # Draw dashed lines to show sleevehead area
-    ax.plot([cw + sh, 0.5*pw - cw - sh], [ph - cl, ph - cl], color='b', lw=1, linestyle='dashed')
-    ax.plot([0.5*pw + cw + sh, pw - cw - sh], [ph - cl, ph - cl], color='b', lw=1, linestyle='dashed')
+    ax.plot([cw + sh, 0.5*pw - cw - sh], [ph - cl, ph - cl], color='b', lw=0.5, linestyle='dashed')
+    ax.plot([0.5*pw + cw + sh, pw - cw - sh], [ph - cl, ph - cl], color='b', lw=0.5, linestyle='dashed')
     # Draw dashed lines to show center back notches and associated sew lengths
-    ax.plot([0.5*pw - bn1, 0.5*pw - bn1], [ph - cl - 14, ph - cl], color='k', lw=1, linestyle='dashdot') # 14 is stitch length from ZWP by BH, may adjust as desired
-    ax.plot([0.5*pw + bn1, 0.5*pw + bn1], [ph - cl - 14, ph - cl], color='k', lw=1, linestyle='dashdot') # 14 is stitch length from ZWP by BH, may adjust as desired
-    ax.plot([0.5*pw - bn1 - bn2, 0.5*pw - bn1 - bn2], [ph - cl - 1, ph - cl], color='k', lw=1.5, linestyle='dashdot') # -1 to show just a notch
-    ax.plot([0.5*pw + bn1 + bn2, 0.5*pw + bn1 + bn2], [ph - cl - 1, ph - cl], color='k', lw=1.5, linestyle='dashdot') # -1 to show just a notch
+    ax.plot([0.5*pw - bn1, 0.5*pw - bn1], [ph - cl - 14, ph - cl], color='k', lw=0.5, linestyle='dashdot') # 14 is stitch length from ZWP by BH, may adjust as desired
+    ax.plot([0.5*pw + bn1, 0.5*pw + bn1], [ph - cl - 14, ph - cl], color='k', lw=0.5, linestyle='dashdot') # 14 is stitch length from ZWP by BH, may adjust as desired
+    ax.plot([0.5*pw - bn1, 0.5*pw - bn1], [ph - cl - 1, ph - cl], color='k', lw=1.5, linestyle='solid') # to show notch
+    ax.plot([0.5*pw + bn1, 0.5*pw + bn1], [ph - cl - 1, ph - cl], color='k', lw=1.5, linestyle='solid') # to show notch
+    ax.plot([0.5*pw - bn1 - bn2, 0.5*pw - bn1 - bn2], [ph - cl - 1, ph - cl], color='k', lw=1.5, linestyle='solid') # -1 to show just a notch
+    ax.plot([0.5*pw + bn1 + bn2, 0.5*pw + bn1 + bn2], [ph - cl - 1, ph - cl], color='k', lw=1.5, linestyle='solid') # -1 to show just a notch
     # Draw dashed lines to show center front notches
-    ax.plot([fn1, fn1], [ph - cl - bh, 0], color='k', lw=1, linestyle='dashdot')
-    ax.plot([pw - fn1, pw - fn1], [ph - cl - bh, 0], color='k', lw=1, linestyle='dashdot')
-    ax.plot([fn1 + fn2, fn1 + fn2], [ph - cl - bh, 0], color='k', lw=1, linestyle='dashdot')
-    ax.plot([pw - fn1 - fn2, pw - fn1 -fn2], [ph - cl - bh, 0], color='k', lw=1, linestyle='dashdot')
-    ax.plot([fn1 + fn2 + fn3, fn1 + fn2 + fn3], [ph - cl - bh - 1, ph - cl - bh], color='k', lw=1.5, linestyle='dashdot')
-    ax.plot([pw - fn1 - fn2 - fn3, pw - fn1 - fn2 - fn3], [ph - cl - bh - 1, ph - cl - bh], color='k', lw=1.5, linestyle='dashdot')
+    ax.plot([fn1, fn1], [ph - cl - bh, 0], color='k', lw=0.5, linestyle='dashdot')
+    ax.plot([pw - fn1, pw - fn1], [ph - cl - bh, 0], color='k', lw=0.5, linestyle='dashdot')
+    ax.plot([fn1, fn1], [ph - cl - bh - 1, ph - cl - bh], color='k', lw=1.5, linestyle='solid') # to show notch
+    ax.plot([pw - fn1, pw - fn1], [ph - cl - bh - 1, ph - cl - bh], color='k', lw=1.5, linestyle='solid') # to show notch
+
+    ax.plot([fn1 + fn2, fn1 + fn2], [ph - cl - bh, 0], color='k', lw=0.5, linestyle='dashdot')
+    ax.plot([pw - fn1 - fn2, pw - fn1 -fn2], [ph - cl - bh, 0], color='k', lw=0.5, linestyle='dashdot')
+    ax.plot([fn1 + fn2, fn1 + fn2], [ph - cl - bh - 1, ph - cl - bh], color='k', lw=1.5, linestyle='solid') # to show notch
+    ax.plot([pw - fn1 - fn2, pw - fn1 -fn2], [ph - cl - bh - 1, ph - cl - bh], color='k', lw=1.5, linestyle='solid') # to show notch
+
+    ax.plot([fn1 + fn2 + fn3, fn1 + fn2 + fn3], [ph - cl - bh - 1, ph - cl - bh], color='k', lw=1.5, linestyle='solid') # just notch
+    ax.plot([pw - fn1 - fn2 - fn3, pw - fn1 - fn2 - fn3], [ph - cl - bh - 1, ph - cl - bh], color='k', lw=1.5, linestyle='solid') # just notch
 
     # Setting limits
     ax.set_xlim(-10, 150)
