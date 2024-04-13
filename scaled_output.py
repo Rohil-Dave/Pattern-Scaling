@@ -4,6 +4,7 @@ from matplotlib.patches import Rectangle
 #from matplotlib.patches import Arc
 from matplotlib.path import Path
 from matplotlib.patches import PathPatch
+import ezdxf
 
 # Input variables key:
 # pw: pattern width
@@ -121,4 +122,4 @@ def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh, bx, by):
     plt.show()
 
 
-draw_tee_pattern(pw=140, ph=90, cw=9.5, cl=25, sd=3, sh=15, bw=14, bh=14, bx=6, by=6)
+draw_tee_pattern(pw=140, ph=100, cw=8, cl=25, sd=5, sh=15, bw=14, bh=14, bx=6, by=6)
