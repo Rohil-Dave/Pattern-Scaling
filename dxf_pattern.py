@@ -1,13 +1,11 @@
 import ezdxf
 
-# # Input variables key:
-# # pw: pattern width
-# # ph: pattern height
+# Input variables key:
+# pw: pattern width
+# ph: pattern height
 # cw: collar width
 # cl: collar length
 
-
-import ezdxf
 
 def draw_tee_pattern_dxf(pw, ph, cw, cl):
     # Create a new DXF document.
@@ -19,10 +17,10 @@ def draw_tee_pattern_dxf(pw, ph, cw, cl):
 
     # Draw the collar pieces
     collar_positions = [
-        (0, ph - cl), 
-        (0.5 * pw - cw, ph - cl),
-        (0.5 * pw, ph - cl),
-        (pw - cw, ph - cl)
+        (0, ph - cl), # left-most collar piece
+        (0.5 * pw - cw, ph - cl), # left middle collar piece
+        (0.5 * pw, ph - cl), # right middle collar piece
+        (pw - cw, ph - cl) # right-most collar piece
     ]
     for x, y in collar_positions:
         msp.add_lwpolyline([(x, y), (x + cw, y), (x + cw, y + cl), (x, y + cl), (x, y)], close=True)
@@ -32,5 +30,5 @@ def draw_tee_pattern_dxf(pw, ph, cw, cl):
     # # Save the drawing as 'test.dxf' in the current directory
     doc.saveas("test.dxf")
 
-# Test the function with the same parameters as before
+# Execute the function
 draw_tee_pattern_dxf(pw=140, ph=100, cw=9.5, cl=25)
