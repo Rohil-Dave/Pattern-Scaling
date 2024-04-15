@@ -37,7 +37,7 @@ def draw_tee_pattern_dxf(pw, ph, cw, cl, bw, bh, sd, sh):
     for x, y in b5_positions:
         msp.add_lwpolyline([(x, y), (x + bw, y), (x + bw, y + bh), (x, y + bh), (x, y)], close=True)
 
-    # Draw sleevehead curves:
+    # Draw sleevehead curves
     sleeve_data = [
         ((cw + sh, ph - cl), (0.25 * pw, ph - cl - sd), (0.5 * pw - cw - sh, ph - cl)),
         ((0.5 * pw + cw + sh, ph - cl), (0.75 * pw, ph - cl - sd), (pw - cw - sh, ph - cl))
@@ -45,10 +45,10 @@ def draw_tee_pattern_dxf(pw, ph, cw, cl, bw, bh, sd, sh):
     for start, control, end in sleeve_data:
         msp.add_spline([start, control, end])
     
-
-
-
-
+    # Draw armhole lines
+    al = 0.5 * (0.5 * pw - 2 * cw)  # Calculate armhole length
+    msp.add_line((0.25 * pw, ph - cl - sd), (0.25 * pw, ph - cl - sd - al))
+    msp.add_line((0.75 * pw, ph - cl - sd), (0.75 * pw, ph - cl - sd - al))
 
     # Save the drawing as 'test.dxf' in the current directory
     doc.saveas("test.dxf")
