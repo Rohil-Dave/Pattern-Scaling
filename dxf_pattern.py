@@ -5,12 +5,14 @@ import ezdxf
 # ph: pattern height
 # cw: collar width
 # cl: collar length
+# bw: B5 width
+# bh: B5 height
 
 
-def draw_tee_pattern_dxf(pw, ph, cw, cl):
-    # Create a new DXF document.
-    doc = ezdxf.new(dxfversion='R2010')
-    msp = doc.modelspace()
+def draw_tee_pattern_dxf(pw, ph, cw, cl, bw, bh):
+    
+    doc = ezdxf.new(dxfversion='R2010') # Create a new DXF document
+    msp = doc.modelspace() # Create a new modelspace in the DXF document
 
     # Draw the main rectangle body of the pattern
     msp.add_lwpolyline([(0, 0), (pw, 0), (pw, ph), (0, ph), (0, 0)], close=True)
@@ -25,10 +27,17 @@ def draw_tee_pattern_dxf(pw, ph, cw, cl):
     for x, y in collar_positions:
         msp.add_lwpolyline([(x, y), (x + cw, y), (x + cw, y + cl), (x, y + cl), (x, y)], close=True)
 
-    
+    # Draw B5 boxes
+    b5_positions = [
+        (0, ph - cl - bh),  # position for the left B5 piece
+        (pw - bw, ph - cl - bh)  # position for the right B5 piece
+    ]
+    for x, y in b5_positions:
+        msp.add_lwpolyline([(x, y), (x + bw, y), (x + bw, y + bh), (x, y + bh), (x, y)], close=True)
 
-    # # Save the drawing as 'test.dxf' in the current directory
+
+    # Save the drawing as 'test.dxf' in the current directory
     doc.saveas("test.dxf")
 
 # Execute the function
-draw_tee_pattern_dxf(pw=140, ph=100, cw=9.5, cl=25)
+draw_tee_pattern_dxf(pw=140, ph=100, cw=9.5, cl=25, bh=14, bw=14)
