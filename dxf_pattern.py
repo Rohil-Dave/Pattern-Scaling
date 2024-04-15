@@ -11,7 +11,7 @@ import ezdxf
 # sh: sleevehead indent
 
 
-def draw_tee_pattern_dxf(pw, ph, cw, cl, bw, bh, sd, sh):
+def draw_tee_pattern_dxf(pw, ph, cw, cl, bw, bh, sd, sh, bx, by):
     
     doc = ezdxf.new(dxfversion='R2010') # Create a new DXF document
     msp = doc.modelspace() # Create a new modelspace in the DXF document
@@ -37,6 +37,19 @@ def draw_tee_pattern_dxf(pw, ph, cw, cl, bw, bh, sd, sh):
     for x, y in b5_positions:
         msp.add_lwpolyline([(x, y), (x + bw, y), (x + bw, y + bh), (x, y + bh), (x, y)], close=True)
 
+    # Add B5 elements with curves
+    msp.add_spline(fit_points=[
+        (0, ph - cl - bh),
+        (bx, ph - cl - bh),
+        (bw, ph - cl - bh),
+        (bw, ph - cl - by)
+    ])
+    msp.add_spline(fit_points=[
+        (pw - bx, ph - cl - bh),
+        (pw - bw, ph - cl - bh),
+        (pw - bw, ph - cl - by)
+    ])
+
     # Draw sleevehead curves
     sleeve_data = [
         ((cw + sh, ph - cl), (0.25 * pw, ph - cl - sd), (0.5 * pw - cw - sh, ph - cl)),
@@ -60,4 +73,4 @@ def draw_tee_pattern_dxf(pw, ph, cw, cl, bw, bh, sd, sh):
     doc.saveas("test.dxf")
 
 # Execute the function
-draw_tee_pattern_dxf(pw=140, ph=100, cw=9.5, cl=25, bh=14, bw=14, sd=3, sh=15)
+draw_tee_pattern_dxf(pw=140, ph=100, cw=9.5, cl=25, bh=14, bw=14, sd=3, sh=15, bx=6, by=6)
