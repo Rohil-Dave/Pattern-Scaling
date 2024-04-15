@@ -44,6 +44,12 @@ def draw_tee_pattern_dxf(pw, ph, cw, cl, bw, bh, sd, sh):
     ]
     for start, control, end in sleeve_data:
         msp.add_spline([start, control, end])
+
+    # Draw lines connecting sleevehead lines to collar pieces
+    msp.add_line((cw, ph - cl), (cw + sh, ph - cl))  # from leftmost collar to the right
+    msp.add_line((0.5 * pw - cw - sh, ph - cl), (0.5 * pw - cw, ph - cl))  # between left middle and center collar
+    msp.add_line((0.5 * pw + cw, ph - cl), (0.5 * pw + cw + sh, ph - cl))  # between center and right middle collar
+    msp.add_line((pw - cw, ph - cl), (pw - cw - sh, ph - cl))  # from rightmost collar to the left
     
     # Draw armhole lines
     al = 0.5 * (0.5 * pw - 2 * cw)  # Calculate armhole length
