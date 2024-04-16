@@ -23,6 +23,8 @@ def draw_layered_pattern_dxf(pw, ph, cw, cl, bw, bh, bx, by, sd, sh):
     doc.layers.new(name='B5', dxfattribs={'color': 2})  # color 2 is yellow
     doc.layers.new(name='Collar', dxfattribs={'color': 3})  # color 3 is green
     doc.layers.new(name='Sleeve', dxfattribs={'color': 4})  # color 4 is cyan
+    doc.layers.new(name='Test', dxfattribs={'color': 5})  # color 5 is indigo
+    doc.layers.new(name='Bodice', dxfattribs={'color': 6})  # color 6 is magenta
 
     msp = doc.modelspace()
 
@@ -94,8 +96,34 @@ def draw_layered_pattern_dxf(pw, ph, cw, cl, bw, bh, bx, by, sd, sh):
     # Draw top hortizontal lines(edges) of sleeve pieces
     msp.add_line((cw, ph), (0.5 * pw - cw, ph), dxfattribs={'layer': 'Sleeve'})
     msp.add_line((0.5 * pw + cw, ph), (pw - cw, ph), dxfattribs={'layer': 'Sleeve'})
-    
 
+    # BODICE LAYER----------------------------------------------------------------
+    # B5 border elements
+    msp.add_line((0, ph - cl - bh), left_horizontal_end, dxfattribs={'layer': 'Bodice'})  # Left horizontal line
+    msp.add_line(left_vertical_end, (bw, ph - cl), dxfattribs={'layer': 'Bodice'})  # Left vertical line
+    msp.add_line(right_horizontal_end, (pw, ph - cl - bh), dxfattribs={'layer': 'Bodice'})  # Right horizontal line
+    msp.add_line((pw - bw, ph - cl), right_vertical_end, dxfattribs={'layer': 'Bodice'})  # Right vertical line
+    msp.add_arc(left_arc_center, radius, left_start_angle, left_end_angle, dxfattribs={'layer': 'Bodice'})
+    msp.add_arc(right_arc_center, radius, right_start_angle, right_end_angle, dxfattribs={'layer': 'Bodice'})
+
+    # Sleeve border elements
+    for start, control, end in sleeve_data:
+        msp.add_spline([start, control, end], dxfattribs={'layer': 'Bodice'})
+    msp.add_line((0.5 * pw - cw - sh, ph - cl), (0.5 * pw + cw + sh, ph - cl), dxfattribs={'layer': 'Bodice'})  # middle connecting line thru center back
+    msp.add_line((bw, ph - cl), (cw + sh, ph - cl), dxfattribs={'layer': 'Bodice'})  # left connecting line thru center front
+    msp.add_line((pw - bw, ph - cl), (pw - cw - sh, ph - cl), dxfattribs={'layer': 'Bodice'})  # right connecting line thru center front
+
+    # Side and bottom border
+    msp.add_lwpolyline([(0, ph - cl - bh), (0, 0), (pw, 0), (pw, ph - cl - bh)], dxfattribs={'layer': 'Bodice'})
+
+    # Draw armhole lines
+    al = 0.5 * (0.5 * pw - 2 * cw)  # Calculate armhole length
+    msp.add_line((0.25 * pw, ph - cl - sd), (0.25 * pw, ph - cl - sd - al), dxfattribs={'layer': 'Bodice'})
+    msp.add_line((0.75 * pw, ph - cl - sd), (0.75 * pw, ph - cl - sd - al), dxfattribs={'layer': 'Bodice'})
+
+
+    # TEST LAYER------------------------------------------------------------------
+    # msp.add_circle((50,50), radius=50, dxfattribs={'layer': 'Test'})
 
     # SAVE DXF FILE---------------------------------------------------------------
     # Save the DXF file
