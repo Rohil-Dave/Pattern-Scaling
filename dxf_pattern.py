@@ -61,6 +61,7 @@ def draw_tee_pattern_dxf(pw, ph, cw, cl, bw, bh, sd, sh, bx, by):
     msp.add_arc(left_arc_center, radius, left_start_angle, left_end_angle)
     msp.add_arc(right_arc_center, radius, right_start_angle, right_end_angle)
 
+
     # Draw sleevehead curves
     sleeve_data = [
         ((cw + sh, ph - cl), (0.25 * pw, ph - cl - sd), (0.5 * pw - cw - sh, ph - cl)),
