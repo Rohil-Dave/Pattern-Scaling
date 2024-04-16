@@ -14,7 +14,7 @@ import ezdxf
 # al: armhole length (calculated from pattern width and collar width)
 
 
-def draw_layered_pattern_dxf(pw, ph, cw, cl):
+def draw_layered_pattern_dxf(pw, ph, cw, cl, bw, bh, bx, by, sd, sh):
 
     # Create a new DXF document
     doc = ezdxf.new('R2010')
@@ -26,7 +26,7 @@ def draw_layered_pattern_dxf(pw, ph, cw, cl):
 
     msp = doc.modelspace()
 
-    # Draw the collar pieces
+    # COLLAR LAYER----------------------------------------------------------------
     collar_positions = [
         (0, ph - cl), # left-most collar piece
         (0.5 * pw - cw, ph - cl), # left middle collar piece
@@ -36,12 +36,72 @@ def draw_layered_pattern_dxf(pw, ph, cw, cl):
     for x, y in collar_positions:
         msp.add_lwpolyline([(x, y), (x + cw, y), (x + cw, y + cl), (x, y + cl), (x, y)], close=True, dxfattribs={'layer': 'Collar'})
 
+    # B5 LAYER--------------------------------------------------------------------
+    # Draw B5 shapes, refered to as left and right respectively, adds straight lines and arcs
+    # ONLY WORKS WHEN bx and by ARE EQUAL!! AND ARE HALF OF bw and bh
+    # Calculate common points
+    left_horizontal_end = (bx, ph - cl - bh)
+    left_vertical_end = (bw, ph - cl - by)
+    right_horizontal_end = (pw - bx, ph - cl - bh)
+    right_vertical_end = (pw - bw, ph - cl - by)
+    
+    # Draw straight lines
+    msp.add_line((0, ph - cl - bh), left_horizontal_end, dxfattribs={'layer': 'B5'})  # Left horizontal line
+    msp.add_line(left_vertical_end, (bw, ph - cl), dxfattribs={'layer': 'B5'})  # Left vertical line
+    msp.add_line(right_horizontal_end, (pw, ph - cl - bh), dxfattribs={'layer': 'B5'})  # Right horizontal line
+    msp.add_line((pw - bw, ph - cl), right_vertical_end, dxfattribs={'layer': 'B5'})  # Right vertical line
+
+    msp.add_lwpolyline([(0, ph - cl - bh), (0, ph - cl), (bw, ph - cl)], dxfattribs={'layer': 'B5'})
+    msp.add_lwpolyline([(pw, ph - cl - bh), (pw, ph - cl), (pw - bw, ph - cl)], dxfattribs={'layer': 'B5'})
+
+    # Calculate the radius, which is the distance from the corner to the curve start
+    radius = bx  # or by, assuming they are the same
+    left_arc_center = (bx, ph - cl - by)
+    right_arc_center = (pw - bx, ph - cl - by)
+    # The start and end angles depend on the orientation of the lines
+    # For the left side:
+    left_start_angle = 270  # Starting from the bottom, going counter-clockwise
+    left_end_angle = 360  # Ending to the right
+    # For the right side, it would be mirrored
+    right_start_angle = 180  # Starting from the left, going counter-clockwise
+    right_end_angle = 270  # Ending to the bottom
+
+    # Draw arcs for the rounded corners
+    msp.add_arc(left_arc_center, radius, left_start_angle, left_end_angle, dxfattribs={'layer': 'B5'})
+    msp.add_arc(right_arc_center, radius, right_start_angle, right_end_angle, dxfattribs={'layer': 'B5'})
+
+    # SLEEVE LAYER-----------------------------------------------------------------
+    # Draw sleevehead curves
+    sleeve_data = [
+        ((cw + sh, ph - cl), (0.25 * pw, ph - cl - sd), (0.5 * pw - cw - sh, ph - cl)),
+        ((0.5 * pw + cw + sh, ph - cl), (0.75 * pw, ph - cl - sd), (pw - cw - sh, ph - cl))
+    ]
+    for start, control, end in sleeve_data:
+        msp.add_spline([start, control, end], dxfattribs={'layer': 'Sleeve'})
+
+    # Draw lines connecting sleevehead lines to collar pieces
+    msp.add_line((cw, ph - cl), (cw + sh, ph - cl), dxfattribs={'layer': 'Sleeve'})  # from leftmost collar to the right
+    msp.add_line((0.5 * pw - cw - sh, ph - cl), (0.5 * pw - cw, ph - cl), dxfattribs={'layer': 'Sleeve'})  # between left middle and center collar
+    msp.add_line((0.5 * pw + cw, ph - cl), (0.5 * pw + cw + sh, ph - cl), dxfattribs={'layer': 'Sleeve'})  # between center and right middle collar
+    msp.add_line((pw - cw, ph - cl), (pw - cw - sh, ph - cl), dxfattribs={'layer': 'Sleeve'})  # from rightmost collar to the left
+
+    # Draw vertical lines(edges) of sleeve pieces
+    msp.add_line((cw, ph), (cw, ph - cl), dxfattribs={'layer': 'Sleeve'})
+    msp.add_line((0.5 * pw - cw, ph), (0.5 * pw - cw, ph - cl), dxfattribs={'layer': 'Sleeve'})
+    msp.add_line((0.5 * pw + cw, ph), (0.5 * pw + cw, ph - cl), dxfattribs={'layer': 'Sleeve'})
+    msp.add_line((pw - cw, ph), (pw - cw, ph - cl), dxfattribs={'layer': 'Sleeve'})
+
+    # Draw top hortizontal lines(edges) of sleeve pieces
+    msp.add_line((cw, ph), (0.5 * pw - cw, ph), dxfattribs={'layer': 'Sleeve'})
+    msp.add_line((0.5 * pw + cw, ph), (pw - cw, ph), dxfattribs={'layer': 'Sleeve'})
     
 
+
+    # SAVE DXF FILE---------------------------------------------------------------
     # Save the DXF file
     doc.saveas("pattern_with_layers.dxf")
 
 # Execute the function
-draw_layered_pattern_dxf(pw=140, ph=100, cw=9.5, cl=25)
+draw_layered_pattern_dxf(pw=140, ph=100, cw=9.5, cl=25, bh=14, bw=14, bx=7, by=7, sd=3, sh=15)
 
-# bh=14, bw=14, sd=3, sh=15, bx=7, by=7
+ 
