@@ -9,6 +9,9 @@ import ezdxf
 # bh: B5 height
 # sd: sleevehead depth
 # sh: sleevehead indent
+# bx: B5 straight line extent x-coordinate
+# by: B5 straight line extent y-coordinate
+# al: armhole length (calculated from pattern width and collar width)
 
 
 def draw_tee_pattern_dxf(pw, ph, cw, cl, bw, bh, sd, sh, bx, by):
@@ -29,26 +32,34 @@ def draw_tee_pattern_dxf(pw, ph, cw, cl, bw, bh, sd, sh, bx, by):
     for x, y in collar_positions:
         msp.add_lwpolyline([(x, y), (x + cw, y), (x + cw, y + cl), (x, y + cl), (x, y)], close=True)
 
-    # Draw B5 boxes
-    b5_positions = [
-        (0, ph - cl - bh),  # position for the left B5 piece
-        (pw - bw, ph - cl - bh)  # position for the right B5 piece
-    ]
-    for x, y in b5_positions:
-        msp.add_lwpolyline([(x, y), (x + bw, y), (x + bw, y + bh), (x, y + bh), (x, y)], close=True)
-
-    # Add B5 elements with curves
-    msp.add_spline(fit_points=[
-        (0, ph - cl - bh),
-        (bx, ph - cl - bh),
-        (bw, ph - cl - bh),
-        (bw, ph - cl - by)
-    ])
-    msp.add_spline(fit_points=[
-        (pw - bx, ph - cl - bh),
-        (pw - bw, ph - cl - bh),
-        (pw - bw, ph - cl - by)
-    ])
+    # Draw B5 shapes, refered to as left and right respectively, adds straight lines and arcs
+    # ONLY WORKS WHEN bx and by ARE EQUAL!!
+    # Calculate common points
+    left_horizontal_end = (bx, ph - cl - bh)
+    left_vertical_end = (bw, ph - cl - by)
+    right_horizontal_end = (pw - bx, ph - cl - bh)
+    right_vertical_end = (pw - bw, ph - cl - by)
+    # Calculate the radius, which is the distance from the corner to the curve start
+    radius = bx  # or by, assuming they are the same
+    # Assuming that bx and by are the same and the radius for the curve,
+    # the center of the arc would be offset from the ends of the lines by the radius
+    left_arc_center = (bx, ph - cl - by)
+    right_arc_center = (pw - bx, ph - cl - by)
+    # The start and end angles depend on the orientation of the lines
+    # For the left side:
+    left_start_angle = 270  # Starting from the bottom, going counter-clockwise
+    left_end_angle = 360  # Ending to the right
+    # For the right side, it would be mirrored
+    right_start_angle = 180  # Starting from the left, going counter-clockwise
+    right_end_angle = 270  # Ending to the bottom
+    # Draw straight lines
+    msp.add_line((0, ph - cl - bh), left_horizontal_end)  # Left horizontal line
+    msp.add_line(left_vertical_end, (bw, ph - cl))  # Left vertical line
+    msp.add_line(right_horizontal_end, (pw, ph - cl - bh))  # Right horizontal line
+    msp.add_line((pw - bw, ph - cl), right_vertical_end)  # Right vertical line
+    # Draw arcs for the rounded corners
+    msp.add_arc(left_arc_center, radius, left_start_angle, left_end_angle)
+    msp.add_arc(right_arc_center, radius, right_start_angle, right_end_angle)
 
     # Draw sleevehead curves
     sleeve_data = [
@@ -73,4 +84,4 @@ def draw_tee_pattern_dxf(pw, ph, cw, cl, bw, bh, sd, sh, bx, by):
     doc.saveas("test.dxf")
 
 # Execute the function
-draw_tee_pattern_dxf(pw=140, ph=100, cw=9.5, cl=25, bh=14, bw=14, sd=3, sh=15, bx=6, by=6)
+draw_tee_pattern_dxf(pw=140, ph=100, cw=9.5, cl=25, bh=14, bw=14, sd=3, sh=15, bx=7, by=7)
