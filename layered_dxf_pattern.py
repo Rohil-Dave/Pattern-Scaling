@@ -117,19 +117,65 @@ def draw_layered_pattern_dxf(pw, ph, cw, cl, bw, bh, bx, by, sd, sh):
     msp.add_lwpolyline([(0, ph - cl - bh), (0, 0), (pw, 0), (pw, ph - cl - bh)], dxfattribs={'layer': 'Bodice'})
 
     # Draw armhole lines
-    al = 0.5 * (0.5 * pw - 2 * cw)  # Calculate armhole length
+    al = 0.5 * (0.5 * pw - (2 * cw))  # Calculate armhole length
     msp.add_line((0.25 * pw, ph - cl - sd), (0.25 * pw, ph - cl - sd - al), dxfattribs={'layer': 'Bodice'})
     msp.add_line((0.75 * pw, ph - cl - sd), (0.75 * pw, ph - cl - sd - al), dxfattribs={'layer': 'Bodice'})
 
 
-    # TEST LAYER------------------------------------------------------------------
-    # msp.add_circle((50,50), radius=50, dxfattribs={'layer': 'Test'})
+    # # TEST LAYER------------------------------------------------------------------
+    # fit_points = [
+    #     (0, 0),  # Starting point
+    #     (50, 0),  # Mid-point on a straight line
+    #     (100, 50),  # Arc peak or control point for a curve
+    #     (150, 0),  # End of arc or curve
+    #     (200, 0),  # Another straight segment
+    #     (0, 0)   # Closing back to the start
+    # ]
+    # # Create a spline that fits all these points
+    # spline = msp.add_spline(dxfattribs={'layer': 'Test'})
+    # spline.fit_points = fit_points
 
     # SAVE DXF FILE---------------------------------------------------------------
     # Save the DXF file
-    doc.saveas("pattern_with_layers.dxf")
+    doc.saveas("main_func_test.dxf")
+
+
+
+def calculate_and_draw(user_measurments):
+    # Extract user measurements
+    shirt_length = user_measurments['shirt_length']
+    bust_circ = user_measurments['bust_circ']
+    arm_circ = user_measurments['arm_circ']
+
+    # Calculate pattern dimensions
+    ease = 5 # Fixed ease
+    cw = 9.5 # Fixed for now
+    sd = 3 # Fixed for now
+    sh = 15 # Fixed for now
+    bw = bh = 14 # Fixed for now
+    bx = by = 0.5 * bw
+
+    cl = arm_circ + ease
+    ph = shirt_length + cl + ease
+    pw = bust_circ + 35 + ease
+    
+    # Draw the pattern
+    draw_layered_pattern_dxf(pw, ph, cw, cl, bw, bh, bx, by, sd, sh)
+
+
+def main():
+    user_measurements = {}
+    user_measurements['shirt_length'] = float(input("Enter your shirt length (cm): "))
+    user_measurements['bust_circ'] = float(input("Enter your chest/bust circumference (cm): "))
+    user_measurements['arm_circ'] = float(input("Enter your arm circumference (cm): "))
+
+    calculate_and_draw(user_measurements)
+
+# Execute main function
+if __name__ == "__main__":
+    main()
 
 # Execute the function
-draw_layered_pattern_dxf(pw=140, ph=100, cw=9.5, cl=25, bh=14, bw=14, bx=7, by=7, sd=3, sh=15)
+# draw_layered_pattern_dxf(pw=140, ph=100, cw=9.5, cl=25, bh=14, bw=14, bx=7, by=7, sd=3, sh=15)
 
  
