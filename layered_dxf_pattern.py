@@ -139,16 +139,41 @@ def draw_layered_pattern_dxf(pw, ph, cw, cl, bw, bh, bx, by, sd, sh):
     # Save the DXF file
     doc.saveas("main_func_test.dxf")
 
+'''Assigns fabric width based on bust/chest and hip measurements'''
+def get_fabric_width(bust, hip):
+    # Fabric width ranges mapped to max chest/bust and hip measurements
+    fabric_width_mapping = [
+        (135, 96, 104),  # (Fabric width, max bust, max hip)
+        (140, 101, 109),
+        (145, 106, 114),
+        (150, 111, 119),
+        (155, 116, 124),
+    ]
+    
+    # Determine the larger of the chest or hip measurements
+    largest_measurement = max(bust, hip)
+    
+    # Find the smallest fabric width that fits the largest measurement
+    for fabric_width, max_chest, max_hip in fabric_width_mapping:
+        if largest_measurement <= max(max_chest, max_hip):
+            return fabric_width  # Return the matching fabric width
+    
+    # If the measurement is larger than all available sizes, return the largest fabric width
+    return fabric_width_mapping[-1][0]
+
 
 
 def calculate_and_draw(user_measurments):
     # Extract user measurements
     shirt_length = user_measurments['shirt_length']
     bust_circ = user_measurments['bust_circ']
+    hip_circ = user_measurments['hip_circ']
     arm_circ = user_measurments['arm_circ']
 
     # Calculate pattern dimensions
     ease = 5 # Fixed ease
+
+    # Also kept fixed for all by BH of ZWP book
     cw = 9.5 # Fixed for now
     sd = 3 # Fixed for now
     sh = 15 # Fixed for now
@@ -157,16 +182,20 @@ def calculate_and_draw(user_measurments):
 
     cl = arm_circ + ease
     ph = shirt_length + cl + ease
-    pw = bust_circ + 35 + ease
+    #pw = bust_circ + 35 + ease  # pw based on constant and ease from bust only
+
+    pw = get_fabric_width(bust_circ, hip_circ)  # pw based on ranges for bust and hip
     
     # Draw the pattern
     draw_layered_pattern_dxf(pw, ph, cw, cl, bw, bh, bx, by, sd, sh)
+    return pw, ph, cw, cl, bw, bh, bx, by, sd, sh
 
 
 def main():
     user_measurements = {}
     user_measurements['shirt_length'] = float(input("Enter your shirt length (cm): "))
     user_measurements['bust_circ'] = float(input("Enter your chest/bust circumference (cm): "))
+    user_measurements['hip_circ'] = float(input("Enter your hip circumference (cm): "))
     user_measurements['arm_circ'] = float(input("Enter your arm circumference (cm): "))
 
     calculate_and_draw(user_measurements)
@@ -178,4 +207,10 @@ if __name__ == "__main__":
 # Execute the function
 # draw_layered_pattern_dxf(pw=140, ph=100, cw=9.5, cl=25, bh=14, bw=14, bx=7, by=7, sd=3, sh=15)
 
+
+
+# Rules and relationships:
+# - Smaller collar width means a thinner collar and longer sleeves
+# - Larger collar length means wider sleeve holes
+# 
  
