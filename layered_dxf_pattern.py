@@ -11,10 +11,12 @@ import ezdxf
 # sh: sleevehead indent
 # bx: B5 straight line extent x-coordinate
 # by: B5 straight line extent y-coordinate
+# eh: encapulation rectangle height
 # al: armhole length (calculated from pattern width and collar width)
 
 
-def draw_layered_pattern_dxf(pw, ph, cw, cl, bw, bh, bx, by, sd, sh):
+
+def draw_layered_pattern_dxf(pw, ph, cw, cl, bw, bh, bx, by, sd, sh, eh):
 
     # Create a new DXF document
     doc = ezdxf.new('R2010')
@@ -23,8 +25,9 @@ def draw_layered_pattern_dxf(pw, ph, cw, cl, bw, bh, bx, by, sd, sh):
     doc.layers.new(name='B5', dxfattribs={'color': 2})  # color 2 is yellow
     doc.layers.new(name='Collar', dxfattribs={'color': 3})  # color 3 is green
     doc.layers.new(name='Sleeve', dxfattribs={'color': 4})  # color 4 is cyan
-    doc.layers.new(name='Test', dxfattribs={'color': 5})  # color 5 is indigo
+    #doc.layers.new(name='Test', dxfattribs={'color': 5})  # color 5 is indigo
     doc.layers.new(name='Bodice', dxfattribs={'color': 6})  # color 6 is magenta
+    doc.layers.new(name='Encap', dxfattribs={'color': 1})  # color 1 is red
 
     msp = doc.modelspace()
 
@@ -122,6 +125,10 @@ def draw_layered_pattern_dxf(pw, ph, cw, cl, bw, bh, bx, by, sd, sh):
     msp.add_line((0.75 * pw, ph - cl - sd), (0.75 * pw, ph - cl - sd - al), dxfattribs={'layer': 'Bodice'})
 
 
+    # ENCAPSULATION LAYER----------------------------------------------------------
+    # Bottom rectangle for sensor and circuit encapsulation
+    msp.add_lwpolyline([(0, 0), (0, -eh), (pw, -eh), (pw, 0), (0, 0)], close=True, dxfattribs={'layer': 'Encap'})
+
     # # TEST LAYER------------------------------------------------------------------
     # fit_points = [
     #     (0, 0),  # Starting point
@@ -185,10 +192,12 @@ def calculate_and_draw(user_measurments):
     #pw = bust_circ + 35 + ease  # pw based on constant and ease from bust only
 
     pw = get_fabric_width(bust_circ, hip_circ)  # pw based on ranges for bust and hip
+
+    eh = 2.5 # Encapsulation depth
     
     # Draw the pattern
-    draw_layered_pattern_dxf(pw, ph, cw, cl, bw, bh, bx, by, sd, sh)
-    return pw, ph, cw, cl, bw, bh, bx, by, sd, sh
+    draw_layered_pattern_dxf(pw, ph, cw, cl, bw, bh, bx, by, sd, sh, eh)
+    return pw, ph, cw, cl, bw, bh, bx, by, sd, sh, eh
 
 
 def main():
@@ -212,5 +221,6 @@ if __name__ == "__main__":
 # Rules and relationships:
 # - Smaller collar width means a thinner collar and longer sleeves
 # - Larger collar length means wider sleeve holes
-# 
+# - Larger B5 width and height means a larger B5 piece, which takes away from the center front of bodice
+# - 
  
