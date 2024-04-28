@@ -45,11 +45,11 @@ def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh, bx, by):
 
     # Draw B5 areas, for necklines, and for usage as back neck facing or pockets, etc.
     # Construct B5 straight lines in x direction (width)
-    ax.plot([0, bx], [ph - cl - bh, ph - cl - bh], color='b', lw=1)
-    ax.plot([pw - bx, pw], [ph - cl - bh, ph - cl - bh], color='b', lw=1)
+    ax.plot([0, bx], [ph - cl - bh, ph - cl - bh], color='r', lw=1)
+    ax.plot([pw - bx, pw], [ph - cl - bh, ph - cl - bh], color='r', lw=1)
     # Construct B5 straight lines in y direction (length/height)
-    ax.plot([bw, bw], [ph - cl, ph - cl - by], color='b', lw=1)
-    ax.plot([pw - bw, pw - bw], [ph - cl, ph - cl - by], color='b', lw=1)
+    ax.plot([bw, bw], [ph - cl, ph - cl - by], color='r', lw=1)
+    ax.plot([pw - bw, pw - bw], [ph - cl, ph - cl - by], color='r', lw=1)
 
     B5_left_start = (bx, ph - cl - bh)
     B5_left_control = (bw, ph - cl - bh)   
@@ -122,4 +122,4 @@ def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh, bx, by):
     plt.show()
 
 
-draw_tee_pattern(pw=140, ph=100, cw=8, cl=25, sd=5, sh=15, bw=14, bh=14, bx=6, by=6)
+draw_tee_pattern(pw=140, ph=100, cw=8, cl=25, sd=3, sh=15, bw=14, bh=14, bx=6, by=6)
