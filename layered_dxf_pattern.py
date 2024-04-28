@@ -11,12 +11,12 @@ import ezdxf
 # sh: sleevehead indent
 # bx: B5 straight line extent x-coordinate
 # by: B5 straight line extent y-coordinate
-# eh: encapulation rectangle height
+# ew: encapulation rectangle width, added to the right of pattern block not included in pw
 # al: armhole length (calculated from pattern width and collar width)
 
 
 
-def draw_layered_pattern_dxf(pw, ph, cw, cl, bw, bh, bx, by, sd, sh, eh):
+def draw_layered_pattern_dxf(pw, ph, cw, cl, bw, bh, bx, by, sd, sh, ew):
 
     # Create a new DXF document
     doc = ezdxf.new('R2010')
@@ -127,7 +127,7 @@ def draw_layered_pattern_dxf(pw, ph, cw, cl, bw, bh, bx, by, sd, sh, eh):
 
     # ENCAPSULATION LAYER----------------------------------------------------------
     # Bottom rectangle for sensor and circuit encapsulation
-    msp.add_lwpolyline([(0, 0), (0, -eh), (pw, -eh), (pw, 0), (0, 0)], close=True, dxfattribs={'layer': 'Encap'})
+    msp.add_lwpolyline([(pw, 0), (pw, ph), (pw + ew, ph), (pw + ew, 0), (pw, 0)], close=True, dxfattribs={'layer': 'Encap'})
 
     # # TEST LAYER------------------------------------------------------------------
     # fit_points = [
@@ -145,6 +145,7 @@ def draw_layered_pattern_dxf(pw, ph, cw, cl, bw, bh, bx, by, sd, sh, eh):
     # SAVE DXF FILE---------------------------------------------------------------
     # Save the DXF file
     doc.saveas("main_func_test.dxf")
+
 
 '''Assigns fabric width based on bust/chest and hip measurements'''
 def get_fabric_width(bust, hip):
@@ -187,8 +188,8 @@ def calculate_and_draw(user_measurments):
     bw = bh = 14 # Fixed for now
     bx = by = 0.5 * bw
 
-    cl = arm_circ + ease
-    ph = shirt_length + cl + ease
+    cl = arm_circ + ease  # this calculation is wrong!
+    ph = shirt_length + cl + ease  # do not added ease here, must account for hem 
     #pw = bust_circ + 35 + ease  # pw based on constant and ease from bust only
 
     pw = get_fabric_width(bust_circ, hip_circ)  # pw based on ranges for bust and hip
