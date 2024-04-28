@@ -162,8 +162,8 @@ def get_fabric_width(bust, hip):
     largest_measurement = max(bust, hip)
     
     # Find the smallest fabric width that fits the largest measurement
-    for fabric_width, max_chest, max_hip in fabric_width_mapping:
-        if largest_measurement <= max(max_chest, max_hip):
+    for fabric_width, max_bust, max_hip in fabric_width_mapping:
+        if largest_measurement <= max(max_bust, max_hip):
             return fabric_width  # Return the matching fabric width
     
     # If the measurement is larger than all available sizes, return the largest fabric width
