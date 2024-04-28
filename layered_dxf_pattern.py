@@ -221,7 +221,7 @@ if __name__ == "__main__":
 
 
 # Rules and relationships:
-# - Smaller collar width means a thinner collar and longer sleeves
+# - Smaller collar width means a thinner collar and bigger sleeve circumference
 # - cl (collar length) corresponds to the sleeve length
 # - Larger B5 width and height means a larger B5 piece, which takes away from the center front of bodice
 # - 
