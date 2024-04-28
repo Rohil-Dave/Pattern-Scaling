@@ -183,12 +183,13 @@ def calculate_and_draw(user_measurments):
 
     # Also kept fixed for all by BH of ZWP book
     cw = 9.5 # Fixed for now
+    cl = 25 # Fixed for now
     sd = 3 # Fixed for now
     sh = 15 # Fixed for now
     bw = bh = 14 # Fixed for now
     bx = by = 0.5 * bw
 
-    cl = arm_circ + ease  # this calculation is wrong!
+    
     ph = shirt_length + cl + ease  # do not added ease here, must account for hem 
     #pw = bust_circ + 35 + ease  # pw based on constant and ease from bust only
 
