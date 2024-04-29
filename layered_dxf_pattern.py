@@ -161,23 +161,9 @@ def draw_layered_pattern_dxf(pattern_measurements):
     msp.add_line((0.25 * pw, ph - cl - sd), (0.25 * pw, ph - cl - sd - al), dxfattribs={'layer': 'Bodice'})
     msp.add_line((0.75 * pw, ph - cl - sd), (0.75 * pw, ph - cl - sd - al), dxfattribs={'layer': 'Bodice'})
 
-
     # ENCAPSULATION LAYER----------------------------------------------------------
     # Bottom rectangle for sensor and circuit encapsulation
     msp.add_lwpolyline([(pw, 0), (pw, ph), (pw + ew, ph), (pw + ew, 0), (pw, 0)], close=True, dxfattribs={'layer': 'Encap'})
-
-    # # TEST LAYER------------------------------------------------------------------
-    # fit_points = [
-    #     (0, 0),  # Starting point
-    #     (50, 0),  # Mid-point on a straight line
-    #     (100, 50),  # Arc peak or control point for a curve
-    #     (150, 0),  # End of arc or curve
-    #     (200, 0),  # Another straight segment
-    #     (0, 0)   # Closing back to the start
-    # ]
-    # # Create a spline that fits all these points
-    # spline = msp.add_spline(dxfattribs={'layer': 'Test'})
-    # spline.fit_points = fit_points
 
     # SAVE DXF FILE---------------------------------------------------------------
     # Save the DXF file
