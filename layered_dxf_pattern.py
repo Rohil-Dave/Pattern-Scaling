@@ -197,19 +197,6 @@ def calculate_and_draw(user_measurments):
     hip_circ = user_measurments['hip_circ']
     # arm_circ = user_measurments['arm_circ']
 
-    # Calculate pattern dimensions
-    #ease = 5 # Fixed ease
-
-    # Also kept fixed for all by BH of ZWP book
-    cw = 9.5 # Fixed for now
-    sd = 3 # Fixed for now
-    sh = 15 # Fixed for now
-    bw = 14 # Fixed for now, might need separate entries for bh, bx, by
-
-    cl = 25 # Fixed for now
-
-    ew = 2.5 # Encapsulation width
-
     # pattern measurements
     pattern_measurements = {}
     pattern_measurements['cw'] = 9.5 # Fixed for now
