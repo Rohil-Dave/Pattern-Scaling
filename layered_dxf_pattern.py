@@ -6,8 +6,7 @@ are built in for hemming, sewing, etc.
 The output is suitable for being uploaded to Clo 3D
 
 These are some rules and relationships:
-- Smaller collar width means a thinner collar and longer sleeves
-- Larger collar length means wider sleeve holes
+- Smaller collar width means a thinner collar and wider sleeve holes
 - cl (collar length) corresponds to the sleeve length
 - Larger B5 width and height means a larger B5 piece, which takes away from the center front of bodice
 - all measurements are in cms
