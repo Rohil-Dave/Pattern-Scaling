@@ -242,7 +242,8 @@ def main():
     '''
     The main function. We get the user measurements and figure out the pattern
     During the measurement phase we take a few readings (shirt length, bust, hip, 
-    arm, neck, waist, and sleeve length). We may not use them all for this particular pattern
+    arm, neck, waist, shoulder width, and sleeve length). We may not use them all 
+    for this particular pattern
     '''
     user_measurements = {}
     user_measurements['shirt_length'] = float(input("Enter your desired shirt length (cm): "))
@@ -251,6 +252,7 @@ def main():
     user_measurements['arm_circ'] = float(input("Enter your arm circumference (cm): "))
     user_measurements['neck_circ'] = float(input("Enter your neck circumference (cm): "))
     user_measurements['waist_circ'] = float(input("Enter your waist circumference (cm): "))
+    user_measurements['shoulder_width'] = float(input("Enter your shoulder width (cm): "))
     user_measurements['sleeve_length'] = float(input("Enter your desired sleeve length (cm): "))
 
     calculate_and_draw(user_measurements)
