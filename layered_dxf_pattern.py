@@ -12,7 +12,7 @@ These are some rules and relationships:
 - all measurements are in cms
 '''
 __author__ = 'Rohil J Dave'
-__email__ = 'rohildave@gmail.com'
+__email__ = 'rohil.dave20@imperial.ac.uk'
 
 import ezdxf
 
