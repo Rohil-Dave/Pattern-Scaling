@@ -51,7 +51,6 @@ def draw_layered_pattern_dxf(pattern_measurements):
     doc.layers.new(name='B5', dxfattribs={'color': 2})  # color 2 is yellow
     doc.layers.new(name='Collar', dxfattribs={'color': 3})  # color 3 is green
     doc.layers.new(name='Sleeve', dxfattribs={'color': 4})  # color 4 is cyan
-    #doc.layers.new(name='Test', dxfattribs={'color': 5})  # color 5 is indigo
     doc.layers.new(name='Bodice', dxfattribs={'color': 6})  # color 6 is magenta
     doc.layers.new(name='Encap', dxfattribs={'color': 1})  # color 1 is red
 
@@ -199,11 +198,11 @@ def calculate_and_draw(user_measurments):
 
     # pattern measurements
     pattern_measurements = {}
-    pattern_measurements['cw'] = 9.5 # Fixed for now
-    pattern_measurements['sd'] = 3 # Fixed for now
-    pattern_measurements['sh'] = 15 # Fixed for now
-    pattern_measurements['bw'] = 14 # Fixed for now, may need to break out bh, bx, by later
-    pattern_measurements['cl'] = 25 # Fixed for now
+    pattern_measurements['cw'] = 9.5 # FIXED FOR ALL BODIES
+    pattern_measurements['sd'] = 3 # FIXED FOR ALL BODIES
+    pattern_measurements['sh'] = 15 # ?? shoulder_width may influence this, 
+    pattern_measurements['bw'] = 14 # ?? neck_circ may influence this, but have to addres how cl relates to this
+    pattern_measurements['cl'] = 25 # ?? sleeve_length may influence this, but have to address how bw relates to this
     pattern_measurements['ph'] = shirt_length + pattern_measurements['cl'] # do not add ease here, must account for hem
     pattern_measurements['pw'] = get_fabric_width(bust_circ, hip_circ) # pw based on bust, hip ranges
     pattern_measurements['ew'] = 2.5 # Encapsulation depth
