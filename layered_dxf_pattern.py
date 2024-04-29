@@ -200,7 +200,7 @@ def calculate_and_draw(user_measurments):
     pattern_measurements = {}
     pattern_measurements['cw'] = 9.5 # FIXED FOR ALL BODIES
     pattern_measurements['sd'] = 3 # FIXED FOR ALL BODIES
-    pattern_measurements['sh'] = 15 # ?? shoulder_width may influence this, 
+    pattern_measurements['sh'] = 15 # ?? shoulder_width may influence this, but have to address how sd relates to this
     pattern_measurements['bw'] = 14 # ?? neck_circ may influence this, but have to addres how cl relates to this
     pattern_measurements['cl'] = 25 # ?? sleeve_length may influence this, but have to address how bw relates to this
     pattern_measurements['ph'] = shirt_length + pattern_measurements['cl'] # do not add ease here, must account for hem
