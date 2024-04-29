@@ -1,4 +1,31 @@
+#!/usr/bin/env python3
+'''
+This module is used for creating layered tailoring patterns in the dxf format
+These are zero / low waste patterns based on a few body measurements. Tolerances 
+are built in for hemming, sewing, etc. 
+The output is suitable for being uploaded to Clo 3D
+
+These are some rules and relationships:
+- Smaller collar width means a thinner collar and longer sleeves
+- Larger collar length means wider sleeve holes
+- cl (collar length) corresponds to the sleeve length
+- Larger B5 width and height means a larger B5 piece, which takes away from the center front of bodice
+- all measurements are in cms
+'''
+__author__ = 'Rohil J Dave'
+__email__ = 'rohildave@gmail.com'
+
 import ezdxf
+
+# Fabric comes in industry defined widths (135, 140, 145, 150, 155 cms).
+# Fabric width ranges mapped to max chest/bust and hip measurements
+fabric_width_mapping = [
+    (135, 96, 104),  # (Fabric width, max bust, max hip)
+    (140, 101, 109),
+    (145, 106, 114),
+    (150, 111, 119),
+    (155, 116, 124)
+]
 
 # Input variables key:
 # pw: pattern width
@@ -14,10 +41,10 @@ import ezdxf
 # ew: encapulation rectangle width, added to the right of pattern block not included in pw
 # al: armhole length (calculated from pattern width and collar width)
 
-
-
-def draw_layered_pattern_dxf(pw, ph, cw, cl, bw, bh, bx, by, sd, sh, ew):
-
+def draw_layered_pattern_dxf(pattern_measurements):
+    '''
+    Draw a layered pattern in the dxf format and save it in a file
+    '''
     # Create a new DXF document
     doc = ezdxf.new('R2010')
 
@@ -30,6 +57,17 @@ def draw_layered_pattern_dxf(pw, ph, cw, cl, bw, bh, bx, by, sd, sh, ew):
     doc.layers.new(name='Encap', dxfattribs={'color': 1})  # color 1 is red
 
     msp = doc.modelspace()
+
+    pw = pattern_measurements['pw']
+    ph = pattern_measurements['ph']
+    cw = pattern_measurements['cw']
+    cl = pattern_measurements['cl']
+    bw = pattern_measurements['bw']
+    bh = bw # this might be different later, in which case it will be in the pat_measure dict
+    bx = by = bw * 0.5 # these might also be different
+    sd = pattern_measurements['sd']
+    sh = pattern_measurements['sh']
+    ew = pattern_measurements['ew']
 
     # COLLAR LAYER----------------------------------------------------------------
     collar_positions = [
@@ -49,7 +87,7 @@ def draw_layered_pattern_dxf(pw, ph, cw, cl, bw, bh, bx, by, sd, sh, ew):
     left_vertical_end = (bw, ph - cl - by)
     right_horizontal_end = (pw - bx, ph - cl - bh)
     right_vertical_end = (pw - bw, ph - cl - by)
-    
+
     # Draw straight lines
     msp.add_line((0, ph - cl - bh), left_horizontal_end, dxfattribs={'layer': 'B5'})  # Left horizontal line
     msp.add_line(left_vertical_end, (bw, ph - cl), dxfattribs={'layer': 'B5'})  # Left vertical line
@@ -146,83 +184,78 @@ def draw_layered_pattern_dxf(pw, ph, cw, cl, bw, bh, bx, by, sd, sh, ew):
     # Save the DXF file
     doc.saveas("main_func_test.dxf")
 
-
-'''Assigns fabric width based on bust/chest and hip measurements'''
 def get_fabric_width(bust, hip):
-    # Fabric width ranges mapped to max chest/bust and hip measurements
-    fabric_width_mapping = [
-        (135, 96, 104),  # (Fabric width, max bust, max hip)
-        (140, 101, 109),
-        (145, 106, 114),
-        (150, 111, 119),
-        (155, 116, 124),
-    ]
-    
+    '''
+    Assigns fabric width based on bust/chest and hip measurements
+
+    We need to choose the appropriate width based on body measurements
+    '''
+
     # Determine the larger of the chest or hip measurements
     largest_measurement = max(bust, hip)
-    
+
     # Find the smallest fabric width that fits the largest measurement
     for fabric_width, max_bust, max_hip in fabric_width_mapping:
         if largest_measurement <= max(max_bust, max_hip):
             return fabric_width  # Return the matching fabric width
-    
+
     # If the measurement is larger than all available sizes, return the largest fabric width
     return fabric_width_mapping[-1][0]
 
-
-
 def calculate_and_draw(user_measurments):
+    '''
+    calculate the dimensions and draw the pattern
+    '''
     # Extract user measurements
     shirt_length = user_measurments['shirt_length']
     bust_circ = user_measurments['bust_circ']
     hip_circ = user_measurments['hip_circ']
-    arm_circ = user_measurments['arm_circ']
+    # arm_circ = user_measurments['arm_circ']
 
     # Calculate pattern dimensions
-    ease = 5 # Fixed ease
+    #ease = 5 # Fixed ease
 
     # Also kept fixed for all by BH of ZWP book
     cw = 9.5 # Fixed for now
-    cl = 25 # Fixed for now
     sd = 3 # Fixed for now
     sh = 15 # Fixed for now
-    bw = bh = 14 # Fixed for now
-    bx = by = 0.5 * bw
+    bw = 14 # Fixed for now, might need separate entries for bh, bx, by
 
-    
-    ph = shirt_length + cl + ease  # do not added ease here, must account for hem 
-    #pw = bust_circ + 35 + ease  # pw based on constant and ease from bust only
+    cl = 25 # Fixed for now
 
-    pw = get_fabric_width(bust_circ, hip_circ)  # pw based on ranges for bust and hip
+    ew = 2.5 # Encapsulation width
 
-    eh = 2.5 # Encapsulation depth
-    
+    # pattern measurements
+    pattern_measurements = {}
+    pattern_measurements['cw'] = 9.5 # Fixed for now
+    pattern_measurements['sd'] = 3 # Fixed for now
+    pattern_measurements['sh'] = 15 # Fixed for now
+    pattern_measurements['bw'] = 14 # Fixed for now, may need to break out bh, bx, by later
+    pattern_measurements['cl'] = 25 # Fixed for now
+    pattern_measurements['ph'] = shirt_length + pattern_measurements['cl'] # do not add ease here, must account for hem
+    pattern_measurements['pw'] = get_fabric_width(bust_circ, hip_circ) # pw based on bust, hip ranges
+    pattern_measurements['ew'] = 2.5 # Encapsulation depth
+
     # Draw the pattern
-    draw_layered_pattern_dxf(pw, ph, cw, cl, bw, bh, bx, by, sd, sh, eh)
-    return pw, ph, cw, cl, bw, bh, bx, by, sd, sh, eh
-
+    draw_layered_pattern_dxf(pattern_measurements)
 
 def main():
+    '''
+    The main function. We get the user measurements and figure out the pattern
+    During the measurement phase we take a few readings (shirt length, bust, hip, 
+    arm, neck, waist, and sleeve length). We may not use them all for this particular pattern
+    '''
     user_measurements = {}
-    user_measurements['shirt_length'] = float(input("Enter your shirt length (cm): "))
+    user_measurements['shirt_length'] = float(input("Enter your desired shirt length (cm): "))
     user_measurements['bust_circ'] = float(input("Enter your chest/bust circumference (cm): "))
     user_measurements['hip_circ'] = float(input("Enter your hip circumference (cm): "))
     user_measurements['arm_circ'] = float(input("Enter your arm circumference (cm): "))
+    user_measurements['neck_circ'] = float(input("Enter your neck circumference (cm): "))
+    user_measurements['waist_circ'] = float(input("Enter your waist circumference (cm): "))
+    user_measurements['sleeve_length'] = float(input("Enter your desired sleeve length (cm): "))
 
     calculate_and_draw(user_measurements)
 
 # Execute main function
 if __name__ == "__main__":
     main()
-
-# Execute the function
-# draw_layered_pattern_dxf(pw=140, ph=100, cw=9.5, cl=25, bh=14, bw=14, bx=7, by=7, sd=3, sh=15)
-
-
-
-# Rules and relationships:
-# - Smaller collar width means a thinner collar and bigger sleeve circumference
-# - cl (collar length) corresponds to the sleeve length
-# - Larger B5 width and height means a larger B5 piece, which takes away from the center front of bodice
-# - 
- 
