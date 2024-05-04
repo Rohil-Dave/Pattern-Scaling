@@ -12,18 +12,17 @@ These are some rules and relationships:
 - all measurements are in cms
 
 Input variables key:
-pattern width
-pattern height
-collar width
-collar length
-B5 width - neck hole cut width
-B5 height - neck hole cut height
-sleevehead depth
-sleevehead indent
-B5 straight line extent x-coordinate
-B5 straight line extent y-coordinate
-encapulation rectangle width, added to the right of pattern block not included in pattern_width
-armhole length (calculated from pattern width and collar width)
+pattern width, pw
+pattern height, ph
+collar width, cw
+collar length, cl
+B5 width - neck hole cut width, bw
+B5 height - neck hole cut height, bh
+sleevehead depth, sd
+sleevehead indent, sh
+B5 straight line extent x-coordinate, bx
+B5 straight line extent y-coordinate, by
+armhole length (calculated from pattern width and collar width), al
 '''
 __author__ = 'Rohil J Dave'
 __email__ = 'rohil.dave20@imperial.ac.uk'
@@ -52,7 +51,6 @@ def draw_layered_pattern_dxf(p_measurements):
     doc.layers.new(name='Collar', dxfattribs={'color': 3})  # color 3 is green
     doc.layers.new(name='Sleeve', dxfattribs={'color': 4})  # color 4 is cyan
     doc.layers.new(name='Bodice', dxfattribs={'color': 6})  # color 6 is magenta
-    doc.layers.new(name='Encap', dxfattribs={'color': 1})  # color 1 is red
 
     msp = doc.modelspace()
 
@@ -206,7 +204,6 @@ def calculate_and_draw(user_measurments):
     p_measurements['collar_length'] = 25 # ?? sleeve_length may influence this, but have to address how b5_width relates to this
     p_measurements['pattern_height'] = shirt_length + p_measurements['collar_length'] # do not add ease here, must account for hem
     p_measurements['pattern_width'] = get_fabric_width(bust_circ, hip_circ) # pattern_width based on bust, hip ranges
-    p_measurements['encap_width'] = 2.5 # Encapsulation width
     p_measurements['person_id'] = user_measurments['person_id']
 
     # Draw the pattern
