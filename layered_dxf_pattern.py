@@ -51,6 +51,7 @@ def draw_layered_pattern_dxf(p_measurements):
     doc.layers.new(name='Collar', dxfattribs={'color': 3})  # color 3 is green
     doc.layers.new(name='Sleeve', dxfattribs={'color': 4})  # color 4 is cyan
     doc.layers.new(name='Bodice', dxfattribs={'color': 6})  # color 6 is magenta
+    doc.layers.new(name='Sew', dxfattribs={'color': 7})  # color 7 is white
 
     msp = doc.modelspace()
 
@@ -62,7 +63,8 @@ def draw_layered_pattern_dxf(p_measurements):
     b5_height = b5_width # this might be different later, in which case it will be in the p_measurements  dict
     b5_x = b5_y = b5_width * 0.5 # these might also be different
     sleeve_depth = p_measurements['sleeve_depth']
-    sleeve_indent = p_measurements['sleeve_indent']
+    sleeve_radius = p_measurements['sleeve_radius']
+    #sleeve_indent = p_measurements['sleeve_indent'] # Dont need this anymore
 
     # COLLAR LAYER----------------------------------------------------------------
     collar_positions = [
@@ -111,17 +113,17 @@ def draw_layered_pattern_dxf(p_measurements):
     # SLEEVE LAYER-----------------------------------------------------------------
     # Draw sleevehead curves
     sleeve_data = [
-        ((collar_width + sleeve_indent, pattern_height - collar_length), (0.25 * pattern_width, pattern_height - collar_length - sleeve_depth), (0.5 * pattern_width - collar_width - sleeve_indent, pattern_height - collar_length)),
-        ((0.5 * pattern_width + collar_width + sleeve_indent, pattern_height - collar_length), (0.75 * pattern_width, pattern_height - collar_length - sleeve_depth), (pattern_width - collar_width - sleeve_indent, pattern_height - collar_length))
+        ((0.25 * pattern_width - sleeve_radius, pattern_height - collar_length), (0.25 * pattern_width, pattern_height - collar_length - sleeve_depth), (0.25 * pattern_width + sleeve_radius, pattern_height - collar_length)),
+        ((0.75 * pattern_width - sleeve_radius, pattern_height - collar_length), (0.75 * pattern_width, pattern_height - collar_length - sleeve_depth), (0.75 * pattern_width + sleeve_radius, pattern_height - collar_length))
     ]
     for start, control, end in sleeve_data:
         msp.add_spline([start, control, end], dxfattribs={'layer': 'Sleeve'})
 
     # Draw lines connecting sleevehead lines to collar pieces
-    msp.add_line((collar_width, pattern_height - collar_length), (collar_width + sleeve_indent, pattern_height - collar_length), dxfattribs={'layer': 'Sleeve'})  # from leftmost collar to the right
-    msp.add_line((0.5 * pattern_width - collar_width - sleeve_indent, pattern_height - collar_length), (0.5 * pattern_width - collar_width, pattern_height - collar_length), dxfattribs={'layer': 'Sleeve'})  # between left middle and center collar
-    msp.add_line((0.5 * pattern_width + collar_width, pattern_height - collar_length), (0.5 * pattern_width + collar_width + sleeve_indent, pattern_height - collar_length), dxfattribs={'layer': 'Sleeve'})  # between center and right middle collar
-    msp.add_line((pattern_width - collar_width, pattern_height - collar_length), (pattern_width - collar_width - sleeve_indent, pattern_height - collar_length), dxfattribs={'layer': 'Sleeve'})  # from rightmost collar to the left
+    msp.add_line((collar_width, pattern_height - collar_length), (0.25 * pattern_width - sleeve_radius, pattern_height - collar_length), dxfattribs={'layer': 'Sleeve'})  # from leftmost collar to the right
+    msp.add_line((0.25 * pattern_width + sleeve_radius, pattern_height - collar_length), (0.5 * pattern_width - collar_width, pattern_height - collar_length), dxfattribs={'layer': 'Sleeve'})  # between left middle and center collar
+    msp.add_line((0.5 * pattern_width + collar_width, pattern_height - collar_length), (0.75 * pattern_width - sleeve_radius, pattern_height - collar_length), dxfattribs={'layer': 'Sleeve'})  # between center and right middle collar
+    msp.add_line((0.75 * pattern_width + sleeve_radius, pattern_height - collar_length), (pattern_width - collar_width, pattern_height - collar_length), dxfattribs={'layer': 'Sleeve'})  # from rightmost collar to the left
 
     # Draw vertical lines(edges) of sleeve pieces
     msp.add_line((collar_width, pattern_height), (collar_width, pattern_height - collar_length), dxfattribs={'layer': 'Sleeve'})
@@ -145,9 +147,9 @@ def draw_layered_pattern_dxf(p_measurements):
     # Sleeve border elements
     for start, control, end in sleeve_data:
         msp.add_spline([start, control, end], dxfattribs={'layer': 'Bodice'})
-    msp.add_line((0.5 * pattern_width - collar_width - sleeve_indent, pattern_height - collar_length), (0.5 * pattern_width + collar_width + sleeve_indent, pattern_height - collar_length), dxfattribs={'layer': 'Bodice'})  # middle connecting line thru center back
-    msp.add_line((b5_width, pattern_height - collar_length), (collar_width + sleeve_indent, pattern_height - collar_length), dxfattribs={'layer': 'Bodice'})  # left connecting line thru center front
-    msp.add_line((pattern_width - b5_width, pattern_height - collar_length), (pattern_width - collar_width - sleeve_indent, pattern_height - collar_length), dxfattribs={'layer': 'Bodice'})  # right connecting line thru center front
+    msp.add_line((b5_width, pattern_height - collar_length), (0.25 * pattern_width - sleeve_radius, pattern_height - collar_length), dxfattribs={'layer': 'Bodice'})  # middle connecting line thru center back
+    msp.add_line((0.25 * pattern_width + sleeve_radius, pattern_height - collar_length), (0.75 * pattern_width - sleeve_radius, pattern_height - collar_length), dxfattribs={'layer': 'Bodice'})  # left connecting line thru center front
+    msp.add_line((0.75 * pattern_width + sleeve_radius, pattern_height - collar_length), (pattern_width - b5_width, pattern_height - collar_length), dxfattribs={'layer': 'Bodice'})  # right connecting line thru center front
 
     # Side and bottom border
     msp.add_lwpolyline([(0, pattern_height - collar_length - b5_height), (0, 0), (pattern_width, 0), (pattern_width, pattern_height - collar_length - b5_height)], dxfattribs={'layer': 'Bodice'})
@@ -156,6 +158,22 @@ def draw_layered_pattern_dxf(p_measurements):
     al = 0.5 * (0.5 * pattern_width - (2 * collar_width))  # Calculate armhole length
     msp.add_line((0.25 * pattern_width, pattern_height - collar_length - sleeve_depth), (0.25 * pattern_width, pattern_height - collar_length - sleeve_depth - al), dxfattribs={'layer': 'Bodice'})
     msp.add_line((0.75 * pattern_width, pattern_height - collar_length - sleeve_depth), (0.75 * pattern_width, pattern_height - collar_length - sleeve_depth - al), dxfattribs={'layer': 'Bodice'})
+
+    # SEW AND HEM LINES, NOTCHES LAYER--------------------------------------------
+    # CENTER FRONT-------
+    # first notches 2.5cm from CF, second notches 3cm from first notches, third notches 3cm from second notches
+    msp.add_line((2.5, pattern_height - collar_length - b5_height), (2.5, 0), dxfattribs={'layer': 'Sew'})
+    msp.add_line((pattern_width - 2.5, pattern_height - collar_length - b5_height), (pattern_width - 2.5, 0), dxfattribs={'layer': 'Sew', 'linetype': 'DASHED'})
+    msp.add_line((2.5 + 3, pattern_height - collar_length - b5_height), (2.5 + 3, 0), dxfattribs={'layer': 'Sew'})
+    msp.add_line((pattern_width - 2.5 - 3, pattern_height - collar_length - b5_height), (pattern_width - 2.5 - 3, 0), dxfattribs={'layer': 'Sew'})
+    
+    # CENTER BACK--------
+    # notch at CB, first notches 9.5cm from CB, second notches 4.5cm from first notches
+    msp.add_line((0.5 * pattern_width, pattern_height - collar_length), (0.5 * pattern_width, pattern_height - collar_length - 1), dxfattribs={'layer': 'Sew'})
+    msp.add_line((0.5 * pattern_width - 9.5, pattern_height - collar_length), (0.5 * pattern_width - 9.5, pattern_height - collar_length - 14), dxfattribs={'layer': 'Sew'})
+    msp.add_line((0.5 * pattern_width + 9.5, pattern_height - collar_length), (0.5 * pattern_width + 9.5, pattern_height - collar_length - 14), dxfattribs={'layer': 'Sew'})
+    msp.add_line((0.5 * pattern_width - 9.5 - 4.5, pattern_height - collar_length), (0.5 * pattern_width - 9.5 - 4.5, pattern_height - collar_length - 1), dxfattribs={'layer': 'Sew'})
+    msp.add_line((0.5 * pattern_width + 9.5 + 4.5, pattern_height - collar_length), (0.5 * pattern_width + 9.5 + 4.5, pattern_height - collar_length - 1), dxfattribs={'layer': 'Sew'})
 
     # SAVE DXF FILE---------------------------------------------------------------
     # Save the DXF file with the person id in the file name
@@ -174,7 +192,7 @@ def get_fabric_width(user_measurements, p_measurements):
     '''
 
     # Determine the larger of the chest or hip measurements
-    largest_measurement = max(user_measurements['bust_circ'], user_measurements['hip_circ'])
+    largest_measurement = max(user_measurements['bust_circ'], user_measurements['hip_circ']) # should add waist_circ here?
 
     width = largest_measurement + p_measurements['ease'] + p_measurements['sew_tolerance']
 
@@ -198,17 +216,20 @@ def calculate_and_draw(user_measurments):
 
     # pattern measurements
     p_measurements = {}
-    p_measurements['collar_width'] = 9.5 # FIXED FOR ALL BODIES
-    p_measurements['collar_length'] = 25 # FIXED FOR ALL BODIES
-    p_measurements['sleeve_depth'] = 3.5 # FIXED FOR ALL BODIES
 
     p_measurements['ease'] = 25 # currently fixed
     p_measurements['sew_tolerance'] = 6 # FIXED FOR ALL BODIES
-    p_measurements['sleeve_indent'] = 15 # ?? shoulder_width may influence this, but have to address how sleeve_depth relates to this
-    p_measurements['b5_width'] = 14 # ?? neck_circ may influence this, but have to addres how collar_length relates to this
-    
+
+    p_measurements['collar_width'] = 9.5 # FIXED FOR ALL BODIES
+    p_measurements['collar_length'] = 25 # FIXED FOR ALL BODIES
+    p_measurements['sleeve_depth'] = 3.5 # FIXED FOR ALL BODIES
+    p_measurements['sleeve_radius'] = 14 # FIXED FOR ALL BODIES, should not be more than 16/17 ?
+    p_measurements['b5_width'] = 14 # FIXED FOR ALL BODIES
+
     p_measurements['pattern_height'] = shirt_length + p_measurements['collar_length'] # do not add ease here, must account for hem
     p_measurements['pattern_width'] = get_fabric_width(user_measurments, p_measurements) # pattern_width based on bust, hip ranges
+    #p_measurements['sleeve_indent'] = ((p_measurements['pattern_width'] - (4 * p_measurements['collar_length']) - (4 * p_measurements['sleeve_radius'])) / 4) # Dont need this anymore
+
     p_measurements['person_id'] = user_measurments['person_id']
 
     # Draw the pattern
