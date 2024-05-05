@@ -63,7 +63,6 @@ def draw_layered_pattern_dxf(p_measurements):
     b5_x = b5_y = b5_width * 0.5 # these might also be different
     sleeve_depth = p_measurements['sleeve_depth']
     sleeve_indent = p_measurements['sleeve_indent']
-    encap_width = p_measurements['encap_width']
 
     # COLLAR LAYER----------------------------------------------------------------
     collar_positions = [
@@ -158,32 +157,33 @@ def draw_layered_pattern_dxf(p_measurements):
     msp.add_line((0.25 * pattern_width, pattern_height - collar_length - sleeve_depth), (0.25 * pattern_width, pattern_height - collar_length - sleeve_depth - al), dxfattribs={'layer': 'Bodice'})
     msp.add_line((0.75 * pattern_width, pattern_height - collar_length - sleeve_depth), (0.75 * pattern_width, pattern_height - collar_length - sleeve_depth - al), dxfattribs={'layer': 'Bodice'})
 
-    # ENCAPSULATION LAYER----------------------------------------------------------
-    # Bottom rectangle for sensor and circuit encapsulation
-    msp.add_lwpolyline([(pattern_width, 0), (pattern_width, pattern_height), (pattern_width + encap_width, pattern_height), (pattern_width + encap_width, 0), (pattern_width, 0)], close=True, dxfattribs={'layer': 'Encap'})
-
     # SAVE DXF FILE---------------------------------------------------------------
     # Save the DXF file with the person id in the file name
     file_name = p_measurements['person_id'] + '_pattern.dxf'
     doc.saveas(file_name)
 
-def get_fabric_width(bust, hip):
+def get_fabric_width(user_measurements, p_measurements):
     '''
     Assigns fabric width based on bust/chest and hip measurements
 
-    We need to choose the appropriate width based on body measurements
+    We need to choose the appropriate width based on body measurements, ease 
+    and sewing tolerances
+    The formula is the sum of larger body circumference + ease + tolerance
+    If we are not choosing actual measure, then we need to closest bolt width
+    size which is a ceiling on 5 cm boundaries, e.g 130cm, 135cm, 140cm, etc
     '''
 
     # Determine the larger of the chest or hip measurements
-    largest_measurement = max(bust, hip)
+    largest_measurement = max(user_measurements['bust_circ'], user_measurements['hip_circ'])
 
-    # Find the smallest fabric width that fits the largest measurement
-    for fabric_width, max_bust, max_hip in fabric_width_mapping:
-        if largest_measurement <= max(max_bust, max_hip):
-            return fabric_width  # Return the matching fabric width
+    width = largest_measurement + p_measurements['ease'] + p_measurements['sew_tolerance']
 
-    # If the measurement is larger than all available sizes, return the largest fabric width
-    return fabric_width_mapping[-1][0]
+    if user_measurements['actual_measure'] == '1':
+        # return actual computed width
+        return width
+
+    # return the width of the closest bolt (we assume bolt widths are multiples of 5)
+    return width if width % 5 == 0 else width + 5 - width % 5
 
 def calculate_and_draw(user_measurments):
     '''
@@ -194,16 +194,21 @@ def calculate_and_draw(user_measurments):
     bust_circ = user_measurments['bust_circ']
     hip_circ = user_measurments['hip_circ']
     # arm_circ = user_measurments['arm_circ']
+    actual_measure = user_measurments['actual_measure']
 
     # pattern measurements
     p_measurements = {}
     p_measurements['collar_width'] = 9.5 # FIXED FOR ALL BODIES
-    p_measurements['sleeve_depth'] = 3 # FIXED FOR ALL BODIES
+    p_measurements['collar_length'] = 25 # FIXED FOR ALL BODIES
+    p_measurements['sleeve_depth'] = 3.5 # FIXED FOR ALL BODIES
+
+    p_measurements['ease'] = 25 # currently fixed
+    p_measurements['sew_tolerance'] = 6 # FIXED FOR ALL BODIES
     p_measurements['sleeve_indent'] = 15 # ?? shoulder_width may influence this, but have to address how sleeve_depth relates to this
     p_measurements['b5_width'] = 14 # ?? neck_circ may influence this, but have to addres how collar_length relates to this
-    p_measurements['collar_length'] = 25 # ?? sleeve_length may influence this, but have to address how b5_width relates to this
+    
     p_measurements['pattern_height'] = shirt_length + p_measurements['collar_length'] # do not add ease here, must account for hem
-    p_measurements['pattern_width'] = get_fabric_width(bust_circ, hip_circ) # pattern_width based on bust, hip ranges
+    p_measurements['pattern_width'] = get_fabric_width(user_measurments, p_measurements) # pattern_width based on bust, hip ranges
     p_measurements['person_id'] = user_measurments['person_id']
 
     # Draw the pattern
@@ -222,12 +227,13 @@ def main():
     user_measurements['shirt_length'] = float(input("Enter your desired shirt length (cm): "))
     user_measurements['bust_circ'] = float(input("Enter your chest/bust circumference (cm): "))
     user_measurements['hip_circ'] = float(input("Enter your hip circumference (cm): "))
+    user_measurements['waist_circ'] = float(input("Enter your waist circumference (cm): "))
     user_measurements['arm_circ'] = float(input("Enter your arm circumference (cm): "))
     user_measurements['neck_circ'] = float(input("Enter your neck circumference (cm): "))
-    user_measurements['waist_circ'] = float(input("Enter your waist circumference (cm): "))
     user_measurements['shoulder_width'] = float(input("Enter your shoulder width (cm): "))
     user_measurements['sleeve_length'] = float(input("Enter your desired sleeve length (cm): "))
     user_measurements['person_id'] = input('Enter the id of the person (str): ')
+    user_measurements['actual_measure'] = int(input('Enter 1 for actual width / 0 for best bolt fit: '))
 
     calculate_and_draw(user_measurements)
 
