@@ -33,16 +33,6 @@ from matplotlib.patches import Rectangle
 from matplotlib.path import Path
 from matplotlib.patches import PathPatch
 
-# Fabric comes in industry defined widths (135, 140, 145, 150, 155 cms).
-# Fabric width ranges mapped to max chest/bust and hip measurements
-fabric_width_mapping = [
-    (135, 96, 104),  # (Fabric width, max bust, max hip)
-    (140, 101, 109),
-    (145, 106, 114),
-    (150, 111, 119),
-    (155, 116, 124)
-]
-
 def draw_layered_pattern_dxf(p_measurements):
     '''
     Draw a layered pattern in the dxf format and save it in a file
