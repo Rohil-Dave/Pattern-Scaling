@@ -28,6 +28,10 @@ __author__ = 'Rohil J Dave'
 __email__ = 'rohil.dave20@imperial.ac.uk'
 
 import ezdxf
+import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
+from matplotlib.path import Path
+from matplotlib.patches import PathPatch
 
 # Fabric comes in industry defined widths (135, 140, 145, 150, 155 cms).
 # Fabric width ranges mapped to max chest/bust and hip measurements
@@ -180,6 +184,125 @@ def draw_layered_pattern_dxf(p_measurements):
     file_name = p_measurements['person_id'] + '_pattern.dxf'
     doc.saveas(file_name)
 
+def draw_pdf_with_dimensions(p_measurements):
+    '''
+    Creates the pattern in pdf format using matplotlib and adds dimensions
+    needed for user to draw the pattern onto their fabric
+    '''
+    # Create a figure and an axis
+    fig, ax = plt.subplots(figsize=(20, 10))
+
+    pattern_width = p_measurements['pattern_width']
+    pattern_height = p_measurements['pattern_height']
+    collar_width = p_measurements['collar_width']
+    collar_length = p_measurements['collar_length']
+    b5_width = p_measurements['b5_width']
+    b5_height = b5_width 
+    b5_x = b5_y = b5_width * 0.5
+    sleeve_depth = p_measurements['sleeve_depth']
+    sleeve_radius = p_measurements['sleeve_radius']
+    armhole_length = 0.5 * (0.5 * pattern_width - (2 * collar_width))  # Calculated armhole length
+
+    # Draw total area of pattern
+    main_body = Rectangle((0, 0), width=pattern_width, height=pattern_height, linewidth=1, edgecolor='b', facecolor='none')
+    ax.add_patch(main_body)
+
+    # Draw collar areas; collar is split into 4 pieces
+    collar_piece1 = Rectangle((0, pattern_height - collar_length), width=collar_width, height=collar_length, linewidth=1, edgecolor='b', facecolor='none')
+    ax.add_patch(collar_piece1)
+    collar_piece2 = Rectangle((0.5 * pattern_width - collar_width, pattern_height - collar_length), width=collar_width, height=collar_length, linewidth=1, edgecolor='b', facecolor='none')
+    ax.add_patch(collar_piece2)
+    collar_piece3 = Rectangle((0.5 * pattern_width, pattern_height - collar_length), width=collar_width, height=collar_length, linewidth=1, edgecolor='b', facecolor='none')
+    ax.add_patch(collar_piece3)
+    collar_piece4 = Rectangle((pattern_width - collar_width, pattern_height - collar_length), width=collar_width, height=collar_length, linewidth=1, edgecolor='b', facecolor='none')
+    ax.add_patch(collar_piece4)
+
+    # Draw B5 areas, for necklines, and for usage as back neck facing or pockets, etc.
+    # Construct B5 straight lines in x direction (width)
+    ax.plot([0, b5_x], [pattern_height - collar_length - b5_height, pattern_height - collar_length - b5_height], color='b', lw=1)
+    ax.plot([pattern_width - b5_x, pattern_width], [pattern_height - collar_length - b5_height, pattern_height - collar_length - b5_height], color='b', lw=1)
+    # Construct B5 straight lines in y direction (length/height)
+    ax.plot([b5_width, b5_width], [pattern_height - collar_length, pattern_height - collar_length - b5_y], color='b', lw=1)
+    ax.plot([pattern_width - b5_width, pattern_width - b5_width], [pattern_height - collar_length, pattern_height - collar_length - b5_y], color='b', lw=1)
+    # Construct B5 curves
+    B5_left_start = (b5_x, pattern_height - collar_length - b5_height)
+    B5_left_control = (b5_width, pattern_height - collar_length - b5_height)
+    B5_left_end = (b5_width, pattern_height - collar_length - b5_y)
+    B5_left_vertices = [B5_left_start, B5_left_control, B5_left_end]
+    B5_right_start = (pattern_width - b5_x, pattern_height - collar_length - b5_height)
+    B5_right_control = (pattern_width - b5_width, pattern_height - collar_length - b5_height)
+    B5_right_end = (pattern_width - b5_width, pattern_height - collar_length - b5_y)
+    B5_right_vertices = [B5_right_start, B5_right_control, B5_right_end]
+    B5headcodes = [Path.MOVETO, Path.CURVE3, Path.CURVE3]
+    B5_left_path = Path(B5_left_vertices, B5headcodes)
+    B5_right_path = Path(B5_right_vertices, B5headcodes)
+    B5_left_curve = PathPatch(B5_left_path, fc="none", lw=1, edgecolor='b')
+    ax.add_patch(B5_left_curve)
+    B5_right_curve = PathPatch(B5_right_path, fc="none", lw=1, edgecolor='b')
+    ax.add_patch(B5_right_curve)
+
+    # Draw sleevehead curves
+    sleeve1_control = (0.25 * pattern_width, pattern_height - collar_length - 2*sleeve_depth) #multiplied by 2 in plt construction
+    sleeve1_start = (0.25 * pattern_width - sleeve_radius, pattern_height - collar_length)
+    sleeve1_end = (0.25 * pattern_width + sleeve_radius, pattern_height - collar_length)
+    sleeve2_control = (0.75 * pattern_width, pattern_height - collar_length - 2*sleeve_depth) #multiplied by 2 in plt construction
+    sleeve2_start = (0.75 * pattern_width - sleeve_radius, pattern_height - collar_length)
+    sleeve2_end = (0.75 * pattern_width + sleeve_radius, pattern_height - collar_length)
+    sleeve1_vertices = [sleeve1_start, sleeve1_control, sleeve1_end]
+    sleeve2_vertices = [sleeve2_start, sleeve2_control, sleeve2_end]
+    sleeveheadcodes = [Path.MOVETO, Path.CURVE3, Path.CURVE3]
+    sleeve1_path = Path(sleeve1_vertices, sleeveheadcodes)
+    sleeve2_path = Path(sleeve2_vertices, sleeveheadcodes)
+    sleeve1_curve = PathPatch(sleeve1_path, fc="none", lw=1, edgecolor='b')
+    sleeve2_curve = PathPatch(sleeve2_path, fc="none", lw=1, edgecolor='b')
+    ax.add_patch(sleeve1_curve)
+    ax.add_patch(sleeve2_curve)
+    # Draw sleevehead lines
+    ax.plot([collar_width, 0.25 * pattern_width - sleeve_radius], [pattern_height - collar_length, pattern_height - collar_length], color='b', lw=1)
+    ax.plot([0.25 * pattern_width + sleeve_radius, 0.5 * pattern_width - collar_width], [pattern_height - collar_length, pattern_height - collar_length], color='b', lw=1)
+    ax.plot([0.5 * pattern_width + collar_width, 0.75 * pattern_width - sleeve_radius], [pattern_height - collar_length, pattern_height - collar_length], color='b', lw=1)
+    ax.plot([0.75 * pattern_width + sleeve_radius, pattern_width - collar_width], [pattern_height - collar_length, pattern_height - collar_length], color='b', lw=1)
+
+    # Draw armhole lines
+    ax.plot([0.25 * pattern_width, 0.25 * pattern_width], [pattern_height - collar_length - sleeve_depth, pattern_height - collar_length - sleeve_depth - armhole_length], color='b', lw=1)
+    ax.plot([0.75 * pattern_width, 0.75 * pattern_width], [pattern_height - collar_length - sleeve_depth, pattern_height - collar_length - sleeve_depth - armhole_length], color='b', lw=1)
+
+    # Draw dimensions
+    # Annotations for dimensions at specific positions
+    ax.annotate(f'{pattern_width} cm', xy=(pattern_width + 0.2, -5),
+                xytext=(-5.9, -5),
+                textcoords="data", ha="center", va="center",
+                arrowprops=dict(arrowstyle="|-|", lw=1, color='red'))
+    ax.annotate(f'{pattern_height} cm', xy=(pattern_width + 5, 0),
+                xytext=(pattern_width + 5, pattern_height + 5),
+                textcoords="data", va="center", ha="center",
+                arrowprops=dict(arrowstyle="|-|", lw=1, color='red'),
+                rotation=90)
+    ax.annotate(f'{collar_width} cm', xy=(0, pattern_height + 5),
+                xytext=(collar_width + 4.6, pattern_height + 5),
+                textcoords="data", ha="center", va="center",
+                arrowprops=dict(arrowstyle="|-|", lw=1, color='red'))
+    ax.annotate(f'{collar_length} cm', xy=(-5, pattern_height),
+                xytext=(-5, pattern_height - collar_length - 4.6),
+                textcoords="data", ha="center", va="center",
+                arrowprops=dict(arrowstyle="|-|", lw=1, color='red'),
+                rotation=90)
+    ax.annotate(f'{armhole_length:.2f} cm', xy=(0.25 * pattern_width + 5, pattern_height - collar_length - sleeve_depth),
+                xytext=(0.25 * pattern_width + 5, pattern_height - collar_length - sleeve_depth - armhole_length - 6.5),
+                textcoords="data", ha="center", va="center",
+                arrowprops=dict(arrowstyle="|-|", lw=1, color='red'),
+                rotation=90)
+
+    # Setting limits
+    ax.set_xlim(-15, pattern_width + 10)
+    ax.set_ylim(-10, pattern_height + 15)
+    ax.set_aspect('equal')
+    ax.axis('off')  # Change to off to hide axis
+
+    file_name = p_measurements['person_id'] + '_pattern_dimensions.pdf'
+    plt.savefig(file_name, bbox_inches='tight', dpi=300)
+    plt.show()
+
 def get_fabric_width(user_measurements, p_measurements):
     '''
     Assigns fabric width based on bust/chest and hip measurements
@@ -232,8 +355,11 @@ def calculate_and_draw(user_measurments):
 
     p_measurements['person_id'] = user_measurments['person_id']
 
-    # Draw the pattern
+    # Draw the pattern in dxf
     draw_layered_pattern_dxf(p_measurements)
+    
+    # Draw the pattern with dimensions in pdf
+    draw_pdf_with_dimensions(p_measurements)
 
 def main():
     '''
