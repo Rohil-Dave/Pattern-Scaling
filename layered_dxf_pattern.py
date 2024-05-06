@@ -163,7 +163,7 @@ def draw_layered_pattern_dxf(p_measurements):
     # CENTER FRONT-------
     # first notches 2.5cm from CF, second notches 3cm from first notches, third notches 3cm from second notches
     msp.add_line((2.5, pattern_height - collar_length - b5_height), (2.5, 0), dxfattribs={'layer': 'Sew'})
-    msp.add_line((pattern_width - 2.5, pattern_height - collar_length - b5_height), (pattern_width - 2.5, 0), dxfattribs={'layer': 'Sew', 'linetype': 'DASHED'})
+    msp.add_line((pattern_width - 2.5, pattern_height - collar_length - b5_height), (pattern_width - 2.5, 0), dxfattribs={'layer': 'Sew'})
     msp.add_line((2.5 + 3, pattern_height - collar_length - b5_height), (2.5 + 3, 0), dxfattribs={'layer': 'Sew'})
     msp.add_line((pattern_width - 2.5 - 3, pattern_height - collar_length - b5_height), (pattern_width - 2.5 - 3, 0), dxfattribs={'layer': 'Sew'})
     
@@ -254,7 +254,7 @@ def main():
     user_measurements['shoulder_width'] = float(input("Enter your shoulder width (cm): "))
     user_measurements['sleeve_length'] = float(input("Enter your desired sleeve length (cm): "))
     user_measurements['person_id'] = input('Enter the id of the person (str): ')
-    user_measurements['actual_measure'] = int(input('Enter 1 for actual width / 0 for best bolt fit: '))
+    user_measurements['actual_measure'] = int(input('Enter 1 for actual width fit   OR   0 for best bolt width fit: '))
 
     calculate_and_draw(user_measurements)
 
