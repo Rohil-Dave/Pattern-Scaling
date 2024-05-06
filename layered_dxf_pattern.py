@@ -155,9 +155,9 @@ def draw_layered_pattern_dxf(p_measurements):
     msp.add_lwpolyline([(0, pattern_height - collar_length - b5_height), (0, 0), (pattern_width, 0), (pattern_width, pattern_height - collar_length - b5_height)], dxfattribs={'layer': 'Bodice'})
 
     # Draw armhole lines
-    al = 0.5 * (0.5 * pattern_width - (2 * collar_width))  # Calculate armhole length
-    msp.add_line((0.25 * pattern_width, pattern_height - collar_length - sleeve_depth), (0.25 * pattern_width, pattern_height - collar_length - sleeve_depth - al), dxfattribs={'layer': 'Bodice'})
-    msp.add_line((0.75 * pattern_width, pattern_height - collar_length - sleeve_depth), (0.75 * pattern_width, pattern_height - collar_length - sleeve_depth - al), dxfattribs={'layer': 'Bodice'})
+    armhole_length = 0.5 * (0.5 * pattern_width - (2 * collar_width))  # Calculate armhole length
+    msp.add_line((0.25 * pattern_width, pattern_height - collar_length - sleeve_depth), (0.25 * pattern_width, pattern_height - collar_length - sleeve_depth - armhole_length), dxfattribs={'layer': 'Bodice'})
+    msp.add_line((0.75 * pattern_width, pattern_height - collar_length - sleeve_depth), (0.75 * pattern_width, pattern_height - collar_length - sleeve_depth - armhole_length), dxfattribs={'layer': 'Bodice'})
 
     # SEW AND HEM LINES, NOTCHES LAYER--------------------------------------------
     # CENTER FRONT-------
