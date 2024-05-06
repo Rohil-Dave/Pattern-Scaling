@@ -267,6 +267,29 @@ def draw_pdf_with_dimensions(p_measurements):
     ax.plot([0.25 * pattern_width, 0.25 * pattern_width], [pattern_height - collar_length - sleeve_depth, pattern_height - collar_length - sleeve_depth - armhole_length], color='b', lw=1)
     ax.plot([0.75 * pattern_width, 0.75 * pattern_width], [pattern_height - collar_length - sleeve_depth, pattern_height - collar_length - sleeve_depth - armhole_length], color='b', lw=1)
 
+    # Draw hem and sew lines
+    # Center Front hem lines
+    ax.plot([2.5, 2.5], [pattern_height - collar_length - b5_height, 0], color='k', lw=0.5, linestyle='dashdot')
+    ax.plot([pattern_width - 2.5, pattern_width - 2.5], [pattern_height - collar_length - b5_height, 0], color='k', lw=0.5, linestyle='dashdot')
+    ax.plot([2.5 + 3, 2.5 + 3], [pattern_height - collar_length - b5_height, 0], color='k', lw=0.5, linestyle='dashdot')
+    ax.plot([pattern_width - 2.5 - 3, pattern_width - 2.5 - 3], [pattern_height - collar_length - b5_height, 0], color='k', lw=0.5, linestyle='dashdot')
+    # Center Front notches
+    ax.plot([2.5, 2.5], [pattern_height - collar_length - b5_height, pattern_height - collar_length - b5_height - 1], color='k', lw=1.5, linestyle='solid')
+    ax.plot([pattern_width - 2.5, pattern_width - 2.5], [pattern_height - collar_length - b5_height, pattern_height - collar_length - b5_height - 1], color='k', lw=1.5, linestyle='solid')
+    ax.plot([2.5 + 3, 2.5 + 3], [pattern_height - collar_length - b5_height, pattern_height - collar_length - b5_height - 1], color='k', lw=1.5, linestyle='solid')
+    ax.plot([pattern_width - 2.5 - 3, pattern_width - 2.5 - 3], [pattern_height - collar_length - b5_height, pattern_height - collar_length - b5_height - 1], color='k', lw=1.5, linestyle='solid')
+    ax.plot([2.5 + 3 + 3, 2.5 + 3 + 3], [pattern_height - collar_length - b5_height, pattern_height - collar_length - b5_height - 1], color='k', lw=1.5, linestyle='solid')
+    ax.plot([pattern_width - 2.5 - 3 - 3, pattern_width - 2.5 - 3 - 3], [pattern_height - collar_length - b5_height, pattern_height - collar_length - b5_height - 1], color='k', lw=1.5, linestyle='solid')
+    # Center Back pleat sew lines
+    ax.plot([0.5 * pattern_width - 9.5, 0.5 * pattern_width - 9.5], [pattern_height - collar_length, pattern_height - collar_length - 14], color='k', lw=0.5, linestyle='dashdot')
+    ax.plot([0.5 * pattern_width + 9.5, 0.5 * pattern_width + 9.5], [pattern_height - collar_length, pattern_height - collar_length - 14], color='k', lw=0.5, linestyle='dashdot')
+    # Center Back notches
+    ax.plot([0.5 * pattern_width, 0.5 * pattern_width], [pattern_height - collar_length, pattern_height - collar_length - 1], color='k', lw=1.5, linestyle='solid')
+    ax.plot([0.5 * pattern_width - 9.5, 0.5 * pattern_width - 9.5], [pattern_height - collar_length, pattern_height - collar_length - 1], color='k', lw=1.5, linestyle='solid')
+    ax.plot([0.5 * pattern_width + 9.5, 0.5 * pattern_width + 9.5], [pattern_height - collar_length, pattern_height - collar_length - 1], color='k', lw=1.5, linestyle='solid')
+    ax.plot([0.5 * pattern_width - 9.5 - 4.5, 0.5 * pattern_width - 9.5 - 4.5], [pattern_height - collar_length, pattern_height - collar_length - 1], color='k', lw=1.5, linestyle='solid')
+    ax.plot([0.5 * pattern_width + 9.5 + 4.5, 0.5 * pattern_width + 9.5 + 4.5], [pattern_height - collar_length, pattern_height - collar_length - 1], color='k', lw=1.5, linestyle='solid')
+
     # Draw dimensions
     # Annotations for dimensions at specific positions
     ax.annotate(f'{pattern_width} cm', xy=(pattern_width + 0.2, -5),
