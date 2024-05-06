@@ -342,7 +342,7 @@ def get_fabric_width(user_measurements, p_measurements):
 
     width = largest_measurement + p_measurements['ease'] + p_measurements['sew_tolerance']
 
-    if user_measurements['actual_measure'] == '1':
+    if user_measurements['actual_measure'] == 1:
         # return actual computed width
         return width
 
@@ -403,7 +403,7 @@ def main():
     user_measurements['shoulder_width'] = float(input("Enter your shoulder width (cm): "))
     user_measurements['sleeve_length'] = float(input("Enter your desired sleeve length (cm): "))
     user_measurements['person_id'] = input('Enter the id of the person (str): ')
-    user_measurements['actual_measure'] = int(input('Enter 1 for actual width fit   OR   0 for best bolt width fit: '))
+    user_measurements['actual_measure'] = int(input('Enter 1 for actual fit width   OR   0 for best bolt width: '))
 
     calculate_and_draw(user_measurements)
 
