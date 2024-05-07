@@ -19,7 +19,7 @@ collar length, cl
 B5 width - neck hole cut width, bw
 B5 height - neck hole cut height, bh
 sleevehead depth, sd
-sleevehead indent, sh
+sleevehead radius, sr
 B5 straight line extent x-coordinate, bx
 B5 straight line extent y-coordinate, by
 armhole length (calculated from pattern width and collar width), al
@@ -56,11 +56,11 @@ def draw_layered_pattern_dxf(p_measurements):
     collar_width = p_measurements['collar_width']
     collar_length = p_measurements['collar_length']
     b5_width = p_measurements['b5_width']
-    b5_height = b5_width # this might be different later, in which case it will be in the p_measurements  dict
+    b5_height = b5_width # this might be different later, in which case it will be in the p_measurements dict
     b5_x = b5_y = b5_width * 0.5 # these might also be different
     sleeve_depth = p_measurements['sleeve_depth']
     sleeve_radius = p_measurements['sleeve_radius']
-    #sleeve_indent = p_measurements['sleeve_indent'] # Dont need this anymore
+   
 
     # COLLAR LAYER----------------------------------------------------------------
     collar_positions = [
