@@ -413,9 +413,9 @@ def calculate_and_draw(user_measurements):
     p_measurements['pattern_width'] = get_fabric_width(user_measurements, p_measurements) # pattern_width based on bust, hip ranges
     #p_measurements['sleeve_indent'] = ((p_measurements['pattern_width'] - (4 * p_measurements['collar_length']) - (4 * p_measurements['sleeve_radius'])) / 4) # Dont need this anymore
 
-    # see how well it fits the given bolt
+    # See how well it fits the given bolt
     compute_efficiency(user_measurements, p_measurements)
-    # update the database
+    # Update the database
     update_db(user_measurements, p_measurements)
 
     # Draw the pattern in dxf
