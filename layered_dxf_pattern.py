@@ -27,6 +27,8 @@ armhole length (calculated from pattern width and collar width), al
 __author__ = 'Rohil J Dave'
 __email__ = 'rohil.dave20@imperial.ac.uk'
 
+import os
+import csv
 import ezdxf
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
@@ -328,7 +330,7 @@ def get_fabric_width(user_measurements, p_measurements):
     '''
 
     # Determine the larger of the chest or hip measurements
-    largest_measurement = max(user_measurements['bust_circ'], user_measurements['hip_circ']) # should add waist_circ here?
+    largest_measurement = max(user_measurements['bust_circ'], user_measurements['hip_circ'], user_measurements['waist_circ'])
 
     width = largest_measurement + p_measurements['ease'] + p_measurements['sew_tolerance']
 
@@ -339,16 +341,61 @@ def get_fabric_width(user_measurements, p_measurements):
     # return the width of the closest bolt (we assume bolt widths are multiples of 5)
     return width if width % 5 == 0 else width + 5 - width % 5
 
-def calculate_and_draw(user_measurments):
+def update_db(user_measurements, p_measurements):
+    '''
+    write out the values to a csv file
+    '''
+    file_name = './savedvalues.csv'
+
+    file_exists = os.path.exists(file_name)
+    data_to_append = {**user_measurements, **p_measurements}
+    fieldnames = data_to_append.keys()
+
+    # Open the CSV file in append mode
+    with open(file_name, mode='a', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        
+        # Write header if the file doesn't exist
+        if not file_exists:
+            writer.writeheader()
+        
+        # Write data to the file
+        writer.writerow(data_to_append)
+
+def compute_efficiency(user_measurements, p_measurements):
+    '''
+    Compute the efficiency of the pattern
+    We know the 'ideal' pattern width, need to see if it fits the given bolt width
+    If the bolt width is too small, see if we can tip the pattern 90 degrees and 
+    fit the pattern width
+
+    The basic computation is simple: bolt width - patter dimension / bolt width
+
+    We should record whether we used pattern width (option 1), pattern height (option 2)
+    or something more complex. For example if bolt width is smaller than we might need
+    to add a panel or cut the pattern into quads. All of this is lumped as (option 3)
+    and the efficiency is listed as -1
+    '''
+    if p_measurements['pattern_width'] < user_measurements['bolt_width']:
+        p_measurements['Eff_Option'] = 1
+        p_measurements['Efficiency'] = 1 - (user_measurements['bolt_width'] - p_measurements['pattern_width']) / user_measurements['bolt_width']
+    elif p_measurements['pattern_height'] < user_measurements['bolt_width']:
+        p_measurements['Eff_Option'] = 2
+        p_measurements['Efficiency'] = 1 - (user_measurements['bolt_width'] - p_measurements['pattern_height']) / user_measurements['bolt_width']
+    else:
+        p_measurements['Eff_Option'] = 3
+        p_measurements['Efficiency'] = -1.0
+
+def calculate_and_draw(user_measurements):
     '''
     calculate the dimensions and draw the pattern
     '''
     # Extract user measurements
-    shirt_length = user_measurments['shirt_length']
-    bust_circ = user_measurments['bust_circ']
-    hip_circ = user_measurments['hip_circ']
-    # arm_circ = user_measurments['arm_circ']
-    actual_measure = user_measurments['actual_measure']
+    shirt_length = user_measurements['shirt_length']
+    bust_circ = user_measurements['bust_circ']
+    hip_circ = user_measurements['hip_circ']
+    # arm_circ = user_measurements['arm_circ']
+    actual_measure = user_measurements['actual_measure']
 
     # pattern measurements
     p_measurements = {}
@@ -362,13 +409,17 @@ def calculate_and_draw(user_measurments):
     p_measurements['sleeve_radius'] = 14 # FIXED FOR ALL BODIES, should not be more than 16/17 ?
     p_measurements['b5_width'] = 14 # FIXED FOR ALL BODIES
 
-    p_measurements['pattern_height'] = shirt_length + p_measurements['collar_length'] # do not add ease here, must account for hem
-    p_measurements['pattern_width'] = get_fabric_width(user_measurments, p_measurements) # pattern_width based on bust, hip ranges
+    p_measurements['pattern_height'] = shirt_length + p_measurements['collar_length'] + 2.5 # must account for hem of 2.5
+    p_measurements['pattern_width'] = get_fabric_width(user_measurements, p_measurements) # pattern_width based on bust, hip ranges
     #p_measurements['sleeve_indent'] = ((p_measurements['pattern_width'] - (4 * p_measurements['collar_length']) - (4 * p_measurements['sleeve_radius'])) / 4) # Dont need this anymore
 
-    p_measurements['person_id'] = user_measurments['person_id']
+    # see how well it fits the given bolt
+    compute_efficiency(user_measurements, p_measurements)
+    # update the database
+    update_db(user_measurements, p_measurements)
 
     # Draw the pattern in dxf
+    p_measurements['person_id'] = user_measurements['person_id']
     draw_layered_pattern_dxf(p_measurements)
     
     # Draw the pattern with dimensions in pdf
@@ -393,7 +444,8 @@ def main():
     user_measurements['shoulder_width'] = float(input("Enter your shoulder width (cm): "))
     user_measurements['sleeve_length'] = float(input("Enter your desired sleeve length (cm): "))
     user_measurements['person_id'] = input('Enter the id of the person (str): ')
-    user_measurements['actual_measure'] = int(input('Enter 1 for actual fit width   OR   0 for best bolt width: '))
+    user_measurements['actual_measure'] = int(input('Enter 1 for actual fit width OR 0 for best bolt width: '))
+    user_measurements['bolt_width'] = float(input('Enter the width of the bolt you want to use (cm): '))
 
     calculate_and_draw(user_measurements)
 
