@@ -297,13 +297,18 @@ def draw_pdf_with_dimensions(p_measurements):
                 xytext=(collar_width + 4.6, pattern_height + 5),
                 textcoords="data", ha="center", va="center",
                 arrowprops=dict(arrowstyle="|-|", lw=1, color='red'))
-    ax.annotate(f'{collar_length} cm', xy=(-5, pattern_height),
-                xytext=(-5, pattern_height - collar_length - 4.6),
+    ax.annotate(f'{collar_length} cm', xy=(-5, pattern_height - collar_length),
+                xytext=(-5, pattern_height + 4.6),
                 textcoords="data", ha="center", va="center",
                 arrowprops=dict(arrowstyle="|-|", lw=1, color='red'),
                 rotation=90)
     ax.annotate(f'{armhole_length:.2f} cm', xy=(0.25 * pattern_width + 5, pattern_height - collar_length - sleeve_depth),
                 xytext=(0.25 * pattern_width + 5, pattern_height - collar_length - sleeve_depth - armhole_length - 6.5),
+                textcoords="data", ha="center", va="center",
+                arrowprops=dict(arrowstyle="|-|", lw=1, color='red'),
+                rotation=90)
+    ax.annotate(f'{b5_width} cm', xy=(-5, pattern_height - collar_length),
+                xytext=(-5, pattern_height - collar_length - b5_height - 4.6),
                 textcoords="data", ha="center", va="center",
                 arrowprops=dict(arrowstyle="|-|", lw=1, color='red'),
                 rotation=90)
@@ -329,7 +334,7 @@ def get_fabric_width(user_measurements, p_measurements):
     size which is a ceiling on 5 cm boundaries, e.g 130cm, 135cm, 140cm, etc
     '''
 
-    # Determine the larger of the chest or hip measurements
+    # Determine the larger of the chest, waist, hip measurements
     largest_measurement = max(user_measurements['bust_circ'], user_measurements['hip_circ'], user_measurements['waist_circ'])
 
     width = largest_measurement + p_measurements['ease'] + p_measurements['sew_tolerance']
@@ -340,6 +345,33 @@ def get_fabric_width(user_measurements, p_measurements):
 
     # return the width of the closest bolt (we assume bolt widths are multiples of 5)
     return width if width % 5 == 0 else width + 5 - width % 5
+
+def assign_template_size(user_measurements, param):
+    '''
+    Assigns the template size for the neck facing (B5) pieces and sleeve head curves 
+    based on the user's body measurements
+
+    We need to choose the appropriate template sizes when the pattern width is scaled up
+    or down based on the largest bodice circumference (between bust, waist, and hip)
+
+    The ideal range of largest bodice circumference for the base pattern is 95—125 cm
+    '''
+
+    # Determine the larger of the chest, waist, hip measurements
+    largest_measurement = max(user_measurements['bust_circ'], user_measurements['hip_circ'], user_measurements['waist_circ'])
+
+    if param == 'b5_width' or param == 'sleeve_radius':
+        if largest_measurement < 95:  # smaller than ideal range
+            return 12
+        if largest_measurement > 125: # larger than ideal range
+            return 16
+        return 14 # within ideal range
+    if param == 'sleeve_depth':
+        if largest_measurement < 95:
+            return 3
+        if largest_measurement > 125:
+            return 4
+        return 3.5
 
 def update_db(user_measurements, p_measurements):
     '''
@@ -405,9 +437,9 @@ def calculate_and_draw(user_measurements):
 
     p_measurements['collar_width'] = 9.5 # FIXED FOR ALL BODIES
     p_measurements['collar_length'] = 25 # FIXED FOR ALL BODIES
-    p_measurements['sleeve_depth'] = 3.5 # FIXED FOR ALL BODIES
-    p_measurements['sleeve_radius'] = 14 # FIXED FOR ALL BODIES, should not be more than 16/17 ?
-    p_measurements['b5_width'] = 14 # FIXED FOR ALL BODIES
+    p_measurements['sleeve_depth'] = assign_template_size(user_measurements, 'sleeve_depth') # Assigns based on largest body circumference
+    p_measurements['sleeve_radius'] = assign_template_size(user_measurements, 'sleeve_radius') # Assigns based on largest body circumference
+    p_measurements['b5_width'] = assign_template_size(user_measurements, 'b5_width') # Assigns based on largest body circumference
 
     p_measurements['pattern_height'] = shirt_length + p_measurements['collar_length'] + 2.5 # must account for hem of 2.5
     p_measurements['pattern_width'] = get_fabric_width(user_measurements, p_measurements) # pattern_width based on bust, hip ranges
