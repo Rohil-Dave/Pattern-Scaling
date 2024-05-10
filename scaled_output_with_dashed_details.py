@@ -34,28 +34,28 @@ def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh, bx, by, bn1, bn2, fn1, fn2,
     fig, ax = plt.subplots(figsize=(20, 10))
 
     # Draw total area of pattern
-    main_body = Rectangle((0, 0), width=pw, height=ph, linewidth=1, edgecolor='b', facecolor='none')
+    main_body = Rectangle((0, 0), width=pw, height=ph, linewidth=1, edgecolor='k', facecolor='none')
     ax.add_patch(main_body)
 
     # Draw collar areas; collar is split into 4 pieces
-    collar_piece1 = Rectangle((0, ph - cl), width=cw, height=cl, linewidth=1, edgecolor='b', facecolor='none')
+    collar_piece1 = Rectangle((0, ph - cl), width=cw, height=cl, linewidth=1, edgecolor='k', facecolor='none')
     ax.add_patch(collar_piece1)
-    collar_piece2 = Rectangle((0.5*pw - cw, ph - cl), width=cw, height=cl, linewidth=1, edgecolor='b', facecolor='none')
+    collar_piece2 = Rectangle((0.5*pw - cw, ph - cl), width=cw, height=cl, linewidth=1, edgecolor='k', facecolor='none')
     ax.add_patch(collar_piece2)
-    collar_piece3 = Rectangle((0.5*pw, ph - cl), width=cw, height=cl, linewidth=1, edgecolor='b', facecolor='none')
+    collar_piece3 = Rectangle((0.5*pw, ph - cl), width=cw, height=cl, linewidth=1, edgecolor='k', facecolor='none')
     ax.add_patch(collar_piece3)
-    collar_piece3 = Rectangle((pw - cw, ph - cl), width=cw, height=cl, linewidth=1, edgecolor='b', facecolor='none')
+    collar_piece3 = Rectangle((pw - cw, ph - cl), width=cw, height=cl, linewidth=1, edgecolor='k', facecolor='none')
     ax.add_patch(collar_piece3)
 
 
 
     # Draw B5 areas, for necklines, and for usage as back neck facing or pockets, etc.
     # Construct B5 straight lines in x direction (width)
-    ax.plot([0, bx], [ph - cl - bh, ph - cl - bh], color='b', lw=1)
-    ax.plot([pw - bx, pw], [ph - cl - bh, ph - cl - bh], color='b', lw=1)
+    ax.plot([0, bx], [ph - cl - bh, ph - cl - bh], color='k', lw=1)
+    ax.plot([pw - bx, pw], [ph - cl - bh, ph - cl - bh], color='k', lw=1)
     # Construct B5 straight lines in y direction (length/height)
-    ax.plot([bw, bw], [ph - cl, ph - cl - by], color='b', lw=1)
-    ax.plot([pw - bw, pw - bw], [ph - cl, ph - cl - by], color='b', lw=1)
+    ax.plot([bw, bw], [ph - cl, ph - cl - by], color='k', lw=1)
+    ax.plot([pw - bw, pw - bw], [ph - cl, ph - cl - by], color='k', lw=1)
 
     B5_left_start = (bx, ph - cl - bh)
     B5_left_control = (bw, ph - cl - bh)   
@@ -70,9 +70,9 @@ def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh, bx, by, bn1, bn2, fn1, fn2,
     B5_left_path = Path(B5_left_vertices, B5headcodes)
     B5_right_path = Path(B5_right_vertices, B5headcodes)
 
-    B5_left_curve = PathPatch(B5_left_path, fc="none", lw=1, edgecolor='b')
+    B5_left_curve = PathPatch(B5_left_path, fc="none", lw=1, edgecolor='k')
     ax.add_patch(B5_left_curve)
-    B5_right_curve = PathPatch(B5_right_path, fc="none", lw=1, edgecolor='b')
+    B5_right_curve = PathPatch(B5_right_path, fc="none", lw=1, edgecolor='k')
     ax.add_patch(B5_right_curve)
 
     # Simple box B5 pieces
@@ -97,27 +97,27 @@ def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh, bx, by, bn1, bn2, fn1, fn2,
     sleeveheadpath1 = Path(sleeve1_vertices, sleeveheadcodes)
     sleeveheadpath2 = Path(sleeve2_vertices, sleeveheadcodes)
 
-    sleeveline1 = PathPatch(sleeveheadpath1, fc="none", lw=1, edgecolor='b')
+    sleeveline1 = PathPatch(sleeveheadpath1, fc="none", lw=1, edgecolor='k')
     ax.add_patch(sleeveline1)
-    sleeveline2 = PathPatch(sleeveheadpath2, fc="none", lw=1, edgecolor='b')
+    sleeveline2 = PathPatch(sleeveheadpath2, fc="none", lw=1, edgecolor='k')
     ax.add_patch(sleeveline2)
 
 
 
     # Draw lines connecting sleevehead lines to collar pieces, on pattern from left to right
     # Sample: ax.plot([x1, x2], [y1, y2], color='r')
-    ax.plot([cw, cw + sh], [ph - cl, ph - cl], color='b', lw=1)
-    ax.plot([0.5*pw - cw - sh, 0.5*pw - cw], [ph - cl, ph - cl], color='b', lw=1)
-    ax.plot([0.5*pw + cw, 0.5*pw + cw + sh], [ph - cl, ph - cl], color='b', lw=1)
-    ax.plot([pw - cw, pw - cw - sh], [ph - cl, ph - cl], color='b', lw=1)
+    ax.plot([cw, cw + sh], [ph - cl, ph - cl], color='k', lw=1)
+    ax.plot([0.5*pw - cw - sh, 0.5*pw - cw], [ph - cl, ph - cl], color='k', lw=1)
+    ax.plot([0.5*pw + cw, 0.5*pw + cw + sh], [ph - cl, ph - cl], color='k', lw=1)
+    ax.plot([pw - cw, pw - cw - sh], [ph - cl, ph - cl], color='k', lw=1)
 
     
 
 
     # Draw armhole lines
     al = 0.5*(0.5*pw - 2*cw)
-    ax.plot([0.25*pw, 0.25*pw], [ph - cl - sd, ph - cl - sd - al], color='b', lw=1)
-    ax.plot([0.75*pw, 0.75*pw], [ph - cl - sd, ph - cl - sd - al], color='b', lw=1)
+    ax.plot([0.25*pw, 0.25*pw], [ph - cl - sd, ph - cl - sd - al], color='k', lw=1)
+    ax.plot([0.75*pw, 0.75*pw], [ph - cl - sd, ph - cl - sd - al], color='k', lw=1)
 
 
     # Dashed lines showing piece shape details or fold lines or sewing lines
@@ -125,8 +125,8 @@ def draw_tee_pattern(pw, ph, cw, cl, sd, sh, bw, bh, bx, by, bn1, bn2, fn1, fn2,
     ax.plot([0.5*pw, 0.5*pw], [0, ph - cl], color='k', lw=1, linestyle='dashed')
     ax.plot([0.5*pw, 0.5*pw], [ph - cl - 1, ph - cl], color='k', lw=1.5, linestyle='solid') # to emphasize notch
     # Draw dashed lines to show sleevehead area
-    ax.plot([cw + sh, 0.5*pw - cw - sh], [ph - cl, ph - cl], color='b', lw=0.5, linestyle='dashed')
-    ax.plot([0.5*pw + cw + sh, pw - cw - sh], [ph - cl, ph - cl], color='b', lw=0.5, linestyle='dashed')
+    ax.plot([cw + sh, 0.5*pw - cw - sh], [ph - cl, ph - cl], color='k', lw=0.5, linestyle='dashed')
+    ax.plot([0.5*pw + cw + sh, pw - cw - sh], [ph - cl, ph - cl], color='k', lw=0.5, linestyle='dashed')
     # Draw dashed lines to show center back notches and associated sew lengths
     ax.plot([0.5*pw - bn1, 0.5*pw - bn1], [ph - cl - 14, ph - cl], color='k', lw=0.5, linestyle='dashdot') # 14 is stitch length from ZWP by BH, may adjust as desired
     ax.plot([0.5*pw + bn1, 0.5*pw + bn1], [ph - cl - 14, ph - cl], color='k', lw=0.5, linestyle='dashdot') # 14 is stitch length from ZWP by BH, may adjust as desired
