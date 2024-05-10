@@ -394,7 +394,7 @@ def update_db(user_measurements, p_measurements):
     '''
     Writes out the values to a csv file
     '''
-    file_name = './savedvalues.csv'
+    file_name = './ZWSworkshopData.csv'
 
     file_exists = os.path.exists(file_name)
     data_to_append = {**user_measurements, **p_measurements}
