@@ -378,13 +378,13 @@ def assign_template_size(user_measurements, param):
         largest_measurement = max(user_measurements['bust_circ'], user_measurements['waist_circ'], user_measurements['hip_circ'])
 
     if param == 'b5_width' or param == 'sleevehead_radius':
-        if largest_measurement < 70:  # smaller than ideal range
+        if largest_measurement < 95:  # smaller than ideal range
             return 12
         if largest_measurement > 125: # larger than ideal range
             return 16
         return 14 # within ideal range
     if param == 'sleevehead_depth':
-        if largest_measurement < 70:
+        if largest_measurement < 95:
             return 3.0
         if largest_measurement > 125:
             return 4.0
