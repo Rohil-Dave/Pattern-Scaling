@@ -346,10 +346,10 @@ def get_fabric_width(user_measurements, p_measurements):
     '''
 
     # Determine the larger of the chest, waist, (and hip measurements if shirt below hip)
-    if user_measurements['shirt_below_hip'] == 1: 
-        largest_measurement = max(user_measurements['bust_circ'], user_measurements['waist_circ'], user_measurements['hip_circ'])
-    else:
+    if user_measurements['shirt_above_hip'] == 1: 
         largest_measurement = max(user_measurements['bust_circ'], user_measurements['waist_circ'])
+    else:
+        largest_measurement = max(user_measurements['bust_circ'], user_measurements['waist_circ'], user_measurements['hip_circ'])
 
     width = largest_measurement + p_measurements['ease'] + p_measurements['sew_tolerance']
 
@@ -479,7 +479,7 @@ def main():
     user_measurements = {}
     user_measurements['person_id'] = input('Enter the id of the person (str): ')
     user_measurements['desired_shirt_length'] = float(input('Enter your desired shirt length (cm): '))
-    user_measurements['shirt_below_hip'] = int(input('Enter 1 if shirt length goes below hip OR 0 if above hip: '))
+    user_measurements['shirt_above_hip'] = int(input('Enter 1 if shirt length ends above hip OR 0 if shirt length ends below hip: '))
     user_measurements['bust_circ'] = float(input('Enter your chest/bust circumference (cm): '))
     user_measurements['waist_circ'] = float(input('Enter your waist circumference (cm): '))
     user_measurements['hip_circ'] = float(input('Enter your hip circumference (cm): '))
