@@ -467,6 +467,40 @@ def calculate_and_draw(user_measurements):
     # Update the database
     update_db(user_measurements, p_measurements)
 
+def get_valid_float(user_prompt):
+    '''
+    prompt the user to enter the required measurement.
+    Ensure that it is a non negative number ending in a .0 or .5
+    Keep prompting the user till valid input is obtained
+    '''
+    while True:
+        try:
+            number = float(input(user_prompt))
+            if number > 0.0 and number % 0.5 == 0: # check if it is non negative and divisible by 0.5
+                print("Input accepted!")
+                return number
+            else:
+                print("Please enter a number greater than 0 and ending in .0 or .5")
+        except ValueError:
+            print("Invalid input. Please enter a valid floating point number.")
+
+def get_valid_bool(user_prompt):
+    '''
+    prompt the user to enter the required measurement.
+    Ensure that it is a non negative number ending in a .0 or .5
+    Keep prompting the user till valid input is obtained
+    '''
+    while True:
+        try:
+            number = int(input(user_prompt))
+            if number == 0 or number == 1:
+                print("Input accepted!")
+                return number
+            else:
+                print("Please enter 0 or 1")
+        except ValueError:
+            print("Invalid input. Please enter a valid value")
+
 def main():
     '''
     The main function. We get the user measurements and figure out the pattern
@@ -478,17 +512,17 @@ def main():
     '''
     user_measurements = {}
     user_measurements['person_id'] = input('Enter the id of the person (str): ')
-    user_measurements['desired_shirt_length'] = float(input('Enter your desired shirt length (cm): '))
-    user_measurements['shirt_above_hip'] = int(input('Enter 1 if shirt length ends above hip OR 0 if shirt length ends below hip: '))
-    user_measurements['bust_circ'] = float(input('Enter your chest/bust circumference (cm): '))
-    user_measurements['waist_circ'] = float(input('Enter your waist circumference (cm): '))
-    user_measurements['hip_circ'] = float(input('Enter your hip circumference (cm): '))
-    user_measurements['arm_circ'] = float(input('Enter your arm circumference (cm): '))
-    user_measurements['neck_circ'] = float(input('Enter your neck circumference (cm): '))
-    user_measurements['shoulder_width'] = float(input('Enter your shoulder width (cm): '))
-    user_measurements['desired_sleeve_length'] = float(input('Enter your desired sleeve length (cm): '))
-    user_measurements['actual_measure'] = int(input('Enter 1 for actual fit width OR 0 for best bolt width: '))
-    user_measurements['bolt_width'] = float(input('Enter the width of the bolt you want to use (cm): '))
+    user_measurements['desired_shirt_length'] = get_valid_float('Enter your desired shirt length (cm): ')
+    user_measurements['shirt_above_hip'] = get_valid_bool('Enter 1 if shirt length ends above hip OR 0 if below hip: ')
+    user_measurements['bust_circ'] = get_valid_float('Enter your chest/bust circumference (cm): ')
+    user_measurements['waist_circ'] = get_valid_float('Enter your waist circumference (cm): ')
+    user_measurements['hip_circ'] = get_valid_float('Enter your hip circumference (cm): ')
+    user_measurements['arm_circ'] = get_valid_float('Enter your arm circumference (cm): ')
+    user_measurements['neck_circ'] = get_valid_float('Enter your neck circumference (cm): ')
+    user_measurements['shoulder_width'] = get_valid_float('Enter your shoulder width (cm): ')
+    user_measurements['desired_sleeve_length'] = get_valid_float('Enter your desired sleeve length (cm): ')
+    user_measurements['actual_measure'] = get_valid_bool('Enter 1 for actual fit width OR 0 for best bolt width: ')
+    user_measurements['bolt_width'] = get_valid_float('Enter the width of the bolt you want to use (cm): ')
 
     # Generate the customised pattern
     calculate_and_draw(user_measurements)
