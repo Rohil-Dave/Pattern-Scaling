@@ -55,9 +55,24 @@ def calculate_pattern_width(row):
     
 def calculate_pattern_height(row):
     '''
-    Calculate the pattern height for a given scan
+    Calculate the pattern height for a given scan, deriving shirt length from
+    OPTION 1 OR OPTION 2
     '''
+    # OPTION 1: Use the half back center tape measure, waist height, crotch height
+    half_cb_tm = row['Half Back Center Tape Measure']
+    waist_height = row['Waist Height']
+    crotch_height = row['Crotch Height']
+    # Calculate shirt length
+    raw_shirt_length = half_cb_tm + waist_height - crotch_height
+    # Round up to the nearest 0.5cm
+    shirt_length = math.ceil(raw_shirt_length * 2) / 2
+    # Calculate pattern height with collar piece length and hem allowance
+    pattern_height = shirt_length + 25 + 2.5 # add 6cm for hem and 2cm for collar piece
+    return pattern_height
 
+
+    # # OPTION 2: Use the mid shoulder heights, chin height, crotch height
+    # crotch_height = row['Crotch Height']
 
 def analyze_data(scan_data):
     '''
@@ -75,7 +90,7 @@ def analyze_data(scan_data):
         result = {}
         result['person_id'] = row['Scan Code'] # use scan code as unqiue identifier
         result['pattern_width'] = calculate_pattern_width(row)
-        result['pattern_height'] = 92.5 # fixed now for testing purposes
+        result['pattern_height'] = calculate_pattern_height(row) # fixed now for testing purposes
         result['bolt_width_used'] = 150 # fixed now for testing purposes
 
         if result['pattern_width'] > result['bolt_width_used']: # setting these to -1 for now
