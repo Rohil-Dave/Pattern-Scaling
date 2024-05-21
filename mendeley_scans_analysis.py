@@ -77,7 +77,7 @@ def calculate_pattern_height(row):
     # Step 3: Calculate pattern height with collar piece length and hem allowance
     pattern_height = shirt_length + 25 + 2.5 # add 6cm for hem and 2cm for collar piece
 
-    # return pattern_height
+    return pattern_height
 
     # # OPTION 2: Use the mid shoulder heights, chin height, crotch height
     # # Must remove entry in scan_data 'Scan Code' is 66 because user does have mid shoulder height left
