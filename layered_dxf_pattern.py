@@ -501,6 +501,59 @@ def get_valid_bool(user_prompt):
         except ValueError:
             print("Invalid input. Please enter a valid value")
 
+def add_pocket(p_measurements):
+    '''
+    Checks if there is enough cut loss to add a pocket. Determines pocket size based 
+    on cut loss width. 
+    
+    Only considers pocket if pattern width is scaled to actual
+    body measurements and not to the ideal bolt width i.e. actual_measure == 1
+
+    We will set a constant finished pocket size of 10cm by 10cm for all users.
+    For this, seam allowances of 0.5cm are added to the side and bottom edges of the pocket,
+    and heam allowance of 2cm is added to the top edge of the pocket.
+    The pocket pattern piece then has dimensions of 11cm by 12.5cm.
+    '''
+    if p_measurements['actual_measure'] != 1:
+        print("You have opted to use the ideal bolt width based on your measurements. "
+              "Your pattern width will be scaled to the ideal width, resulting in a truest zero-waste design. "
+              "Thus, no added embellishments are possible.")
+        return
+    else:
+        print("You may have enough cut loss to add a pocket(s) to your shirt.")
+        print()
+    
+    pocket_efficiency = {}
+    pocket_efficiency['CutLoss_Width'] = p_measurements['bolt_width'] - p_measurements['pattern_width']
+    pocket_efficiency['CutLoss_Area'] = pocket_efficiency['CutLoss_Width'] * p_measurements['pattern_height']
+    pocket_efficiency['Efficiency'] = 1 - pocket_efficiency['CutLoss_Area'] / (p_measurements['bolt_width'] * p_measurements['pattern_height'])
+    if pocket_efficiency['CutLoss_Width'] < 11:
+        print("Sorry, you do not have enough cut loss to add a pocket.")
+        return
+    if pocket_efficiency['CutLoss_Width'] >= 11 and pocket_efficiency['CutLoss_Width'] < 12.5:
+        possible_pocket_count = p_measurements['pattern_height'] // 12.5
+        print(f"You can create up to {possible_pocket_count} pockets with your excess fabric.")
+    if pocket_efficiency['CutLoss_Width'] >= 12.5:
+        possible_pocket_count = p_measurements['pattern_height'] // 11
+        print(f"You can create up to {possible_pocket_count} pockets with your excess fabric.")
+    print(f"Although you can make {possible_pocket_count} pockets, we recommend adding one or two for this intended aesthetic. "
+          "Of course, this is your shirt and you can ultimately decide what you would like to do. However, we will only provide "
+          "updated efficiency metrics based on the addition of one or two pockets")
+    pocket_efficiency['With_One_Pocket_New_CutLoss_Area'] = pocket_efficiency['CutLoss_Area'] - 11 * 12.5
+    pocket_efficiency['With_Two_Pocket_New_CutLoss_Area'] = pocket_efficiency['CutLoss_Area'] - 2 * 11 * 12.5
+    pocket_efficiency['With_One_Pocket_Efficiency'] = 1 - pocket_efficiency['With_One_Pocket_New_CutLoss_Area'] / (p_measurements['bolt_width'] * p_measurements['pattern_height'])
+    pocket_efficiency['With_Two_Pocket_Efficiency'] = 1 - pocket_efficiency['With_Two_Pocket_New_CutLoss_Area'] / (p_measurements['bolt_width'] * p_measurements['pattern_height'])
+    print(pocket_efficiency)
+    return pocket_efficiency
+
+    # I USED THIS TO TEST add_pocket, changing the values for diffferent scenarios, I realise the way I did possible_pocket_count is not great
+    # p_measurements = {}
+    # p_measurements['bolt_width'] = 135
+    # p_measurements['pattern_width'] = 122
+    # p_measurements['pattern_height'] = 100
+    # p_measurements['actual_measure'] = 1
+    # add_pocket(p_measurements)
+
 def main():
     '''
     The main function. We get the user measurements and figure out the pattern
