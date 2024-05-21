@@ -109,7 +109,9 @@ def analyze_data(scan_data):
     can recoup and increase the efficiency for given bolt width.
     '''
 
-    analyses = []
+    analyses = [] # List of dictionaries to store the results of the analysis
+
+    # For each workshop participant, calculate the cut loss and efficiencies
     for row in scan_data:
         result = {}
         result['person_id'] = row['Scan Code'] # use scan code as unqiue identifier
@@ -135,6 +137,26 @@ def analyze_data(scan_data):
 
     return analyses
 
+def add_pocket(analyses):
+    '''
+    Checks if there is enough cut loss to add a pocket. Determines pocket size based 
+    on cut loss width. 
+    
+    Only considers pocket if pattern width is scaled to actual
+    body measurements and not to the ideal bolt width i.e. actual_measure == 1
+
+    We will set a constant finished pocket size of 10cm by 10cm for all users.
+    For this, seam allowances of 0.5cm are added to the side and bottom edges of the pocket,
+    and heam allowance of 2cm is added to the top edge of the pocket.
+    The pocket pattern piece then has dimensions of 11cm by 12.5cm.
+    '''
+    for row in analyses:
+        if row['cut_loss_width_used'] >= 11:
+            row['pocket_possible'] = 'Yes'
+        else:
+            row['pocket_possible'] = 'No'
+    return analyses
+
 def main():
     '''
     the main routine to analyze 100 scan Mendeley data
@@ -142,6 +164,7 @@ def main():
 
     scan_data = read_mendeley_data()
     analyses = analyze_data(scan_data)
+    analyses = add_pocket(analyses)
 
     output_file = 'test.csv'
     with open(output_file, mode='w', newline='') as file:
