@@ -50,14 +50,12 @@ def calculate_pattern_width(row):
     seat_circ = row['Seat Circum Tape Measure']
     stomach_circ = row['Stomach Max Circum Tape Measure']
     waist_circ = row['Waist Circum Tape Measure']
-    
     # Step 1: Find the largest circumference measurement
     raw_max = max(abdomen_circ, axilla_circ, chestbust_circ, hip_circ, seat_circ, stomach_circ, waist_circ)
     # Step 2: Round up to the nearest 0.5cm
     max_bodice_circ = math.ceil(raw_max * 2) / 2
     # Step 3: Calculate the pattern width with ease and seam allowance
     pattern_width = max_bodice_circ + 25 + 6 # add 25cm for ease (fixed for now) and 6cm for hem
-
     return pattern_width
     
 def calculate_pattern_height(row):
@@ -69,14 +67,12 @@ def calculate_pattern_height(row):
     half_cb_tm = row['Half Back Center Tape Measure']
     waist_height = row['Waist Height']
     crotch_height = row['Crotch Height']
-    
     # Step 1: Calculate shirt length
     raw_shirt_length = half_cb_tm + waist_height - crotch_height
     # Step 2: Round up to the nearest 0.5cm
     shirt_length = math.ceil(raw_shirt_length * 2) / 2
     # Step 3: Calculate pattern height with collar piece length and hem allowance
     pattern_height = shirt_length + 25 + 2.5 # add 6cm for hem and 2cm for collar piece
-
     return pattern_height
 
     # # OPTION 2: Use the mid shoulder heights, chin height, crotch height
@@ -85,7 +81,6 @@ def calculate_pattern_height(row):
     # mid_shoulder_height_R = float(row['Mid Shoulder Height Right'])
     # chin_height = float(row['Chin Height'])
     # crotch_height = float(row['Crotch Height'])
-    
     # # Step 1: Compute the average mid-shoulder height, 
     # # Justification: Central tendency gives a better overall fit than the extremes in fitting
     # mid_shoulder_height = (mid_shoulder_height_L + mid_shoulder_height_R) / 2
@@ -101,7 +96,6 @@ def calculate_pattern_height(row):
     # shirt_length = math.ceil(raw_shirt_length * 2) / 2
     # # Step 6: Calculate pattern height with collar piece length and hem allowance
     # pattern_height = shirt_length + 25 + 2.5 # add 6cm for hem and 2cm for collar piece
-
     # return pattern_height
 
 def analyze_data(scan_data):
