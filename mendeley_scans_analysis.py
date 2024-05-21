@@ -33,7 +33,7 @@ def read_mendeley_data():
             scan_data.append(row)
     return scan_data
 
-def calculate_max_circ(row):
+def calculate_pattern_width(row):
     '''
     Calculate the pattern width for a given scan, taking the maximum of 
     several bodice circumference TM measurements
@@ -45,9 +45,13 @@ def calculate_max_circ(row):
     seat_circ = row['Seat Circum Tape Measure']
     stomach_circ = row['Stomach Max Circum Tape Measure']
     waist_circ = row['Waist Circum Tape Measure']
+    # Find the largest circumference measurement
     raw_max = max(abdomen_circ, axilla_circ, chestbust_circ, hip_circ, seat_circ, stomach_circ, waist_circ)
-    print(raw_max, math.ceil(raw_max * 2) / 2)
-    return math.ceil(raw_max * 2) / 2
+    # Round up to the nearest 0.5cm
+    max_bodice_circ = math.ceil(raw_max * 2) / 2
+    # Calculate the pattern width with ease and hem allowance
+    pattern_width = max_bodice_circ + 25 + 2.5 # add 25cm for ease (fixed for now) and 2.5cm for hem
+    return pattern_width
     
 
 def analyze_data(scan_data):
@@ -65,7 +69,7 @@ def analyze_data(scan_data):
     for row in scan_data:
         result = {}
         result['person_id'] = row['Scan Code'] # use scan code as unqiue identifier
-        result['pattern_width'] = calculate_max_circ(row) + 25 + 2.5 # add 25cm for ease (fixed for now) and 2.5cm for allowance 
+        result['pattern_width'] = calculate_pattern_width(row)
         result['pattern_height'] = 92.5 # fixed now for testing purposes
         result['bolt_width_used'] = 150 # fixed now for testing purposes
 
