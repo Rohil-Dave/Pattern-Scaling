@@ -7,6 +7,7 @@ __author__ = 'Rohil J Dave'
 __email__ = 'rohil.dave20@imperial.ac.uk'
 
 import csv
+from matplotlib import pyplot
 
 def calculate_ideal_bolt_width(width):
     '''
@@ -54,14 +55,75 @@ def analyze_data(workshop_data):
         result['cut_loss_area_used'] = result['cut_loss_width_used'] * row['pattern_height']
         result['efficiency_used'] = 1 - result['cut_loss_area_used'] / (row['bolt_width'] *
             row['pattern_height'])
-        result['ideal_bolt_width'] = calculate_ideal_bolt_width(row['pattern_width'])
-        result['cut_loss_width_ideal'] = result['ideal_bolt_width'] - row['pattern_width']
+        result['bolt_width_ideal'] = calculate_ideal_bolt_width(row['pattern_width'])
+        result['cut_loss_width_ideal'] = result['bolt_width_ideal'] - row['pattern_width']
         result['cut_loss_area_ideal'] = result['cut_loss_width_ideal'] * row['pattern_height']
         result['efficiency_ideal'] = 1 - result['cut_loss_area_ideal'] \
-            / (result['ideal_bolt_width'] * row['pattern_height'])
+            / (result['bolt_width_ideal'] * row['pattern_height'])
+        
+        
         analyses.append(result)
 
     return analyses
+
+def generate_plots(analyses):
+    '''
+    generate some plots of workshop data analyses
+    '''
+
+    # make a list of the ids and values
+    ids = [row['person_id'] for row in analyses]
+    efficiency_used = [row['efficiency_used'] for row in analyses]
+    efficiency_ideal = [row['efficiency_ideal'] for row in analyses]
+    cut_loss_width_used = [row['cut_loss_width_used'] for row in analyses]
+    cut_loss_area_used = [row['cut_loss_area_used'] for row in analyses]
+    cut_loss_width_ideal = [row['cut_loss_width_ideal'] for row in analyses]
+    cut_loss_area_ideal = [row['cut_loss_area_ideal'] for row in analyses]
+    bolt_width_used = [row['bolt_width_used'] for row in analyses]
+    bolt_width_ideal = [row['bolt_width_ideal'] for row in analyses]
+
+    # Create a figure and a 2x2 grid of subplots
+    fig, axs = pyplot.subplots(2, 2, figsize=(12, 10))
+
+    # Plot on each subplot
+    axs[0, 0].plot(ids, efficiency_used, label='Efficiency_Used')  # First subplot
+    axs[0, 0].plot(ids, efficiency_ideal, label='Efficiency_Ideal')  
+    axs[0, 0].set_title('Efficiency values for Workshop attendees')
+    axs[0, 0].set_xlabel('Identifiers')
+    axs[0, 0].set_ylabel('Efficiencies')
+    axs[0, 0].legend()
+
+    axs[0, 1].plot(ids, cut_loss_area_used, label='Cut_Loss_Area_Used')  # Second subplot
+    axs[0, 1].plot(ids, cut_loss_area_ideal, label='Cut_Loss_Area_Ideal')  
+    axs[0, 1].set_title('Cut Loss Area for Workshop attendees')
+    axs[0, 1].set_xlabel('Identifiers')
+    axs[0, 1].set_ylabel('Cut Loss Area')
+    axs[0, 1].legend()
+
+    axs[1, 0].plot(ids, cut_loss_width_used, label='Cut_Loss_Width_Used')  # Third subplot
+    axs[1, 0].plot(ids, cut_loss_width_ideal, label='Cut_Loss_Width_Ideal')  
+    axs[1, 0].set_title('Cut Loss Width for Workshop attendees')
+    axs[1, 0].set_xlabel('Identifiers')
+    axs[1, 0].set_ylabel('Cut Loss Width')
+    axs[1, 0].legend()
+
+    axs[1, 1].plot(ids, bolt_width_used, label='Bolt_Width_Used')  # Fourth subplot
+    axs[1, 1].plot(ids, bolt_width_ideal, label='Bolt_Width_Ideal')  
+    axs[1, 1].set_title('Bolt Width for Workshop attendees')
+    axs[1, 1].set_xlabel('Identifiers')
+    axs[1, 1].set_ylabel('Bolt Width')
+    axs[1, 1].legend()
+
+    '''pyplot.plot(ids, efficiency_used)
+    pyplot.plot(ids, efficiency_ideal)
+    pyplot.xlabel('Identifiers')
+    pyplot.ylabel('Efficiency')
+    pyplot.title('Efficiency values for Workshop attendees')
+    pyplot.legend(['Used', 'Ideal'])'''
+    # Add some space between the plots
+    pyplot.tight_layout()
+    pyplot.savefig('Workshop_Plot.png')
+
 
 def main():
     '''
@@ -70,6 +132,7 @@ def main():
 
     workshop_data = read_workshop_data()
     analyses = analyze_data(workshop_data)
+    generate_plots(analyses)
 
     output_file = 'ZWSworkshopAnalysis.csv'
     with open(output_file, mode='w', newline='') as file:
