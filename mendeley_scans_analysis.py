@@ -49,10 +49,15 @@ def calculate_pattern_width(row):
     raw_max = max(abdomen_circ, axilla_circ, chestbust_circ, hip_circ, seat_circ, stomach_circ, waist_circ)
     # Round up to the nearest 0.5cm
     max_bodice_circ = math.ceil(raw_max * 2) / 2
-    # Calculate the pattern width with ease and hem allowance
-    pattern_width = max_bodice_circ + 25 + 2.5 # add 25cm for ease (fixed for now) and 2.5cm for hem
+    # Calculate the pattern width with ease and seam allowance
+    pattern_width = max_bodice_circ + 25 + 6 # add 25cm for ease (fixed for now) and 6cm for hem
     return pattern_width
     
+def calculate_pattern_height(row):
+    '''
+    Calculate the pattern height for a given scan
+    '''
+
 
 def analyze_data(scan_data):
     '''
