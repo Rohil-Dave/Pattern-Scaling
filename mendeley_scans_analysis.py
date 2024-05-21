@@ -32,10 +32,10 @@ def read_mendeley_data():
                     row[key] = value
             scan_data.append(row)
 
-    # COMMENT OUT THE FOLLOWING LINE IF USING OPTION 1 FOR PATTERN HEIGHT
-    # Remove entries where 'Scan Code' is 66, if using OPTION 2 for pattern height
-    scan_data = [row for row in scan_data if row['Scan Code'] != 66]      
-      
+    # # COMMENT OUT THE FOLLOWING LINE IF USING OPTION 1 FOR PATTERN HEIGHT
+    # # Remove entries where 'Scan Code' is 66, if using OPTION 2 for pattern height
+    # scan_data = [row for row in scan_data if row['Scan Code'] != 66]      
+
     return scan_data
 
 def calculate_pattern_width(row):
@@ -65,44 +65,44 @@ def calculate_pattern_height(row):
     Calculate the pattern height for a given scan, deriving shirt length from
     OPTION 1 OR OPTION 2
     '''
-    # # OPTION 1: Use the half back center tape measure, waist height, crotch height
-    # half_cb_tm = row['Half Back Center Tape Measure']
-    # waist_height = row['Waist Height']
-    # crotch_height = row['Crotch Height']
+    # OPTION 1: Use the half back center tape measure, waist height, crotch height
+    half_cb_tm = row['Half Back Center Tape Measure']
+    waist_height = row['Waist Height']
+    crotch_height = row['Crotch Height']
     
-    # # Step 1: Calculate shirt length
-    # raw_shirt_length = half_cb_tm + waist_height - crotch_height
-    # # Step 2: Round up to the nearest 0.5cm
-    # shirt_length = math.ceil(raw_shirt_length * 2) / 2
-    # # Step 3: Calculate pattern height with collar piece length and hem allowance
-    # pattern_height = shirt_length + 25 + 2.5 # add 6cm for hem and 2cm for collar piece
+    # Step 1: Calculate shirt length
+    raw_shirt_length = half_cb_tm + waist_height - crotch_height
+    # Step 2: Round up to the nearest 0.5cm
+    shirt_length = math.ceil(raw_shirt_length * 2) / 2
+    # Step 3: Calculate pattern height with collar piece length and hem allowance
+    pattern_height = shirt_length + 25 + 2.5 # add 6cm for hem and 2cm for collar piece
 
     # return pattern_height
 
-    # OPTION 2: Use the mid shoulder heights, chin height, crotch height
-    # Must remove entry in scan_data 'Scan Code' is 66 because user does have mid shoulder height left
-    mid_shoulder_height_L = float(row['Mid Shoulder Height Left'])
-    mid_shoulder_height_R = float(row['Mid Shoulder Height Right'])
-    chin_height = float(row['Chin Height'])
-    crotch_height = float(row['Crotch Height'])
+    # # OPTION 2: Use the mid shoulder heights, chin height, crotch height
+    # # Must remove entry in scan_data 'Scan Code' is 66 because user does have mid shoulder height left
+    # mid_shoulder_height_L = float(row['Mid Shoulder Height Left'])
+    # mid_shoulder_height_R = float(row['Mid Shoulder Height Right'])
+    # chin_height = float(row['Chin Height'])
+    # crotch_height = float(row['Crotch Height'])
     
-    # Step 1: Compute the average mid-shoulder height, 
-    # Justification: Central tendency gives a better overall fit than the extremes in fitting
-    mid_shoulder_height = (mid_shoulder_height_L + mid_shoulder_height_R) / 2
-    # Step 2: Determine the center back neck height (CBN Height)
-    cbn_height = mid_shoulder_height + 5  # Center back neck is no more than 5 cm up
-    # Step 3: Validate the chin height constraint
-    # Ensure the chin height is within 10 cm of the center back neck height
-    if abs(chin_height - cbn_height) > 10:
-        raise ValueError("Chin height difference with center back neck height exceeds 10 cm")
-    # Step 4: Calculate the shirt length
-    raw_shirt_length = cbn_height - crotch_height
-    # Step 5: Round up to the nearest 0.5cm
-    shirt_length = math.ceil(raw_shirt_length * 2) / 2
-    # Step 6: Calculate pattern height with collar piece length and hem allowance
-    pattern_height = shirt_length + 25 + 2.5 # add 6cm for hem and 2cm for collar piece
+    # # Step 1: Compute the average mid-shoulder height, 
+    # # Justification: Central tendency gives a better overall fit than the extremes in fitting
+    # mid_shoulder_height = (mid_shoulder_height_L + mid_shoulder_height_R) / 2
+    # # Step 2: Determine the center back neck height (CBN Height)
+    # cbn_height = mid_shoulder_height + 5  # Center back neck is no more than 5 cm up
+    # # Step 3: Validate the chin height constraint
+    # # Ensure the chin height is within 10 cm of the center back neck height
+    # if abs(chin_height - cbn_height) > 10:
+    #     raise ValueError("Chin height difference with center back neck height exceeds 10 cm")
+    # # Step 4: Calculate the shirt length
+    # raw_shirt_length = cbn_height - crotch_height
+    # # Step 5: Round up to the nearest 0.5cm
+    # shirt_length = math.ceil(raw_shirt_length * 2) / 2
+    # # Step 6: Calculate pattern height with collar piece length and hem allowance
+    # pattern_height = shirt_length + 25 + 2.5 # add 6cm for hem and 2cm for collar piece
 
-    return pattern_height
+    # return pattern_height
 
 def analyze_data(scan_data):
     '''
