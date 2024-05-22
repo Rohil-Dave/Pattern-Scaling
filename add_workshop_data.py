@@ -159,17 +159,13 @@ def generate_plots(analyses):
     axs[1, 1].set_xticklabels(ids)
     axs[1, 1].legend(loc='upper right')
 
-    '''pyplot.plot(ids, efficiency_used)
-    pyplot.plot(ids, efficiency_ideal)
-    pyplot.xlabel('Identifiers')
-    pyplot.ylabel('Efficiency')
-    pyplot.title('Efficiency values for Workshop attendees')
-    pyplot.legend(['Used', 'Ideal'])'''
     # Add some space between the plots
     plt.tight_layout()
     plt.savefig('Workshop_Plot.png')
     plt.close()
 
+    # ----------------------------------------------------------------
+    
     fig, ax = plt.subplots(figsize=(12, 10))
 
     # Function to mask and plot data, removes None values for unfinished participants
