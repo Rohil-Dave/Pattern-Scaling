@@ -133,31 +133,31 @@ def generate_plots(analyses):
     fig, axs = plt.subplots(2, 2, figsize=(12, 10))
 
     # Plot on each subplot
-    axs[0, 0].plot(ids, efficiency_used, label='Efficiency_Used')  # First subplot
-    axs[0, 0].plot(ids, efficiency_ideal, label='Efficiency_Ideal')
+    axs[0, 0].plot(ids, efficiency_used, label='Efficiency - Used')  # Used vs Ideal Eff
+    axs[0, 0].plot(ids, efficiency_ideal, label='Efficiency - Ideal')
     axs[0, 0].set_title('Efficiency values for Mendeley Participants')
-    axs[0, 0].set_xlabel('Participant Ids')
+    axs[0, 0].set_xlabel('Participant Scan Codes (IDs)')
     axs[0, 0].set_ylabel('Efficiencies')
     axs[0, 0].legend()
 
-    axs[0, 1].plot(ids, cut_loss_area_used, label='Cut_Loss_Area_Used')  # Second subplot
-    axs[0, 1].plot(ids, cut_loss_area_ideal, label='Cut_Loss_Area_Ideal')
+    axs[0, 1].plot(ids, cut_loss_area_used, label='Cut Loss Area - Used')  # Used vs Ideal Cut Loss Area
+    axs[0, 1].plot(ids, cut_loss_area_ideal, label='Cut Loss Area - Ideal')
     axs[0, 1].set_title('Cut Loss Area for Mendeley Participants')
-    axs[0, 1].set_xlabel('Participant Ids')
+    axs[0, 1].set_xlabel('Participant Scan Codes (IDs)')
     axs[0, 1].set_ylabel('Cut Loss Area')
     axs[0, 1].legend()
 
-    axs[1, 0].plot(ids, cut_loss_width_used, label='Cut_Loss_Width_Used')  # Third subplot
-    axs[1, 0].plot(ids, cut_loss_width_ideal, label='Cut_Loss_Width_Ideal')
+    axs[1, 0].plot(ids, cut_loss_width_used, label='Cut Loss Width - Used')  # Used vs Ideal Cut Loss Width
+    axs[1, 0].plot(ids, cut_loss_width_ideal, label='Cut Loss Width - Ideal')
     axs[1, 0].set_title('Cut Loss Width for Mendeley Participants')
-    axs[1, 0].set_xlabel('Participant Ids')
+    axs[1, 0].set_xlabel('Participant Scan Codes (IDs)')
     axs[1, 0].set_ylabel('Cut Loss Width')
     axs[1, 0].legend()
 
-    axs[1, 1].plot(ids, bolt_width_used, label='Bolt_Width_Used')  # Fourth subplot
-    axs[1, 1].plot(ids, bolt_width_ideal, label='Bolt_Width_Ideal')
+    axs[1, 1].plot(ids, bolt_width_used, label='Bolt Width - Used')  # Used vs Ideal Bolt Width
+    axs[1, 1].plot(ids, bolt_width_ideal, label='Bolt Width - Ideal')
     axs[1, 1].set_title('Bolt Width for Mendeley Participants')
-    axs[1, 1].set_xlabel('Participant Ids')
+    axs[1, 1].set_xlabel('Participant Scan Codes (IDs)')
     axs[1, 1].set_ylabel('Bolt Width')
     axs[1, 1].legend()
 
@@ -165,6 +165,18 @@ def generate_plots(analyses):
     plt.tight_layout()
     plt.savefig('Mendeley_Plot.png')
     plt.close()
+
+   # ----------------------------------------------------------------
+
+    # fig, axs = plt.subplots(3, 2, figsize=(12, 10))
+
+    # axs[0, 0].scatter(ids, efficiency_used, label='Efficiency - Used')  # Used vs Ideal Eff
+    # axs[0, 0].scatter(ids, efficiency_ideal, label='Efficiency - Ideal')
+    # axs[0, 0].set_title('Efficiency values for Mendeley Participants')
+    # axs[0, 0].set_xlabel('Participant Scan Codes (IDs)')
+    # axs[0, 0].set_ylabel('Efficiencies')
+    # axs[0, 0].legend()
+
 
 def generate_bar_graphs(analyses):
     '''
@@ -175,8 +187,8 @@ def generate_bar_graphs(analyses):
     embellishment
     '''
 
-    categories = ['Regular layout', 'Flipped Layout', 'Embellished']
-    colors = ['lightblue', 'gray', 'teal']
+    categories = ['Regular Layout', 'Flipped Layout', 'Embellished']
+    colors = ['lightblue', 'teal', 'maroon']
 
     fig, axs = plt.subplots(3, 2, figsize=(12, 10))
     counter = 0
@@ -197,11 +209,20 @@ def generate_bar_graphs(analyses):
         axs_x = counter % 3
         axs_y = int(counter / 3)
         axs[axs_x, axs_y].bar(categories, values, width=0.25, color=colors)
-        axs[axs_x, axs_y].set_title('Distribution for Bolt width: ' + str(bolt_width))
-        axs[axs_x, axs_y].set_xlabel('Categories')
-        axs[axs_x, axs_y].set_ylabel('Count')
+        axs[axs_x, axs_y].set_title('Distribution for Bolt Width: ' + str(bolt_width), fontsize=16)
+        axs[axs_x, axs_y].set_xlabel('Categories', fontsize=14)
+        axs[axs_x, axs_y].set_ylabel('Count', fontsize=14)
         axs[axs_x, axs_y].set_ylim([0,105])
-        axs[axs_x, axs_y].yaxis.set_major_locator(ticker.MultipleLocator(5)) 
+        axs[axs_x, axs_y].yaxis.set_major_locator(ticker.MultipleLocator(10))
+        # Remove y-axis tick labels
+        axs[axs_x, axs_y].set_yticklabels([])
+        
+        # Create the bars and store them in the 'bars' variable
+        bars = axs[axs_x, axs_y].bar(categories, values, width=0.25, color=colors)
+        # Add counts on top of each bar
+        for bar, value in zip(bars, values):
+            axs[axs_x, axs_y].text(bar.get_x() + bar.get_width() / 2, bar.get_height(), str(value), 
+                                   ha='center', va='bottom')
         counter += 1
 
     # Add some space between the plots
