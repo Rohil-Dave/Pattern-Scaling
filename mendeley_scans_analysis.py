@@ -135,30 +135,30 @@ def generate_plots(analyses):
     # Plot on each subplot
     axs[0, 0].plot(ids, efficiency_used, label='Efficiency - Used')  # Used vs Ideal Eff
     axs[0, 0].plot(ids, efficiency_ideal, label='Efficiency - Ideal')
-    axs[0, 0].set_title('Efficiency values for Mendeley Participants')
-    axs[0, 0].set_xlabel('Participant Scan Codes (IDs)')
-    axs[0, 0].set_ylabel('Efficiencies')
+    axs[0, 0].set_title('Efficiency values for Mendeley Participants', fontsize=14)
+    axs[0, 0].set_xlabel('Participant Scan Codes (IDs)', fontsize=12)
+    axs[0, 0].set_ylabel('Efficiencies', fontsize=12)
     axs[0, 0].legend()
 
     axs[0, 1].plot(ids, cut_loss_area_used, label='Cut Loss Area - Used')  # Used vs Ideal Cut Loss Area
     axs[0, 1].plot(ids, cut_loss_area_ideal, label='Cut Loss Area - Ideal')
-    axs[0, 1].set_title('Cut Loss Area for Mendeley Participants')
-    axs[0, 1].set_xlabel('Participant Scan Codes (IDs)')
-    axs[0, 1].set_ylabel('Cut Loss Area')
+    axs[0, 1].set_title('Cut Loss Area for Mendeley Participants', fontsize=14)
+    axs[0, 1].set_xlabel('Participant Scan Codes (IDs)', fontsize=12)
+    axs[0, 1].set_ylabel('Cut Loss Area (cm$^2$)', fontsize=12)
     axs[0, 1].legend()
 
     axs[1, 0].plot(ids, cut_loss_width_used, label='Cut Loss Width - Used')  # Used vs Ideal Cut Loss Width
     axs[1, 0].plot(ids, cut_loss_width_ideal, label='Cut Loss Width - Ideal')
-    axs[1, 0].set_title('Cut Loss Width for Mendeley Participants')
-    axs[1, 0].set_xlabel('Participant Scan Codes (IDs)')
-    axs[1, 0].set_ylabel('Cut Loss Width')
+    axs[1, 0].set_title('Cut Loss Width for Mendeley Participants', fontsize=14)
+    axs[1, 0].set_xlabel('Participant Scan Codes (IDs)', fontsize=12)
+    axs[1, 0].set_ylabel('Cut Loss Width (cm)', fontsize=12)
     axs[1, 0].legend()
 
     axs[1, 1].plot(ids, bolt_width_used, label='Bolt Width - Used')  # Used vs Ideal Bolt Width
     axs[1, 1].plot(ids, bolt_width_ideal, label='Bolt Width - Ideal')
-    axs[1, 1].set_title('Bolt Width for Mendeley Participants')
-    axs[1, 1].set_xlabel('Participant Scan Codes (IDs)')
-    axs[1, 1].set_ylabel('Bolt Width')
+    axs[1, 1].set_title('Bolt Width for Mendeley Participants', fontsize=14)
+    axs[1, 1].set_xlabel('Participant Scan Codes (IDs)', fontsize=12)
+    axs[1, 1].set_ylabel('Bolt Width (cm)', fontsize=12)
     axs[1, 1].legend()
 
     # Add some space between the plots
