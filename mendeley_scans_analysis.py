@@ -113,12 +113,12 @@ def analyze_data(scan_data):
 
     return analyses
 
-def generate_plots(analyses):
+def generate_plots(analyses, scan_data):
     '''
     generate some plots of mendeley data analyses
     '''
 
-    # make a list of the ids and values
+    # make a list of the ids and calculated values
     ids = [row['person_id'] for row in analyses]
     efficiency_used = [row['efficiency_used'] for row in analyses]
     efficiency_ideal = [row['efficiency_ideal'] for row in analyses]
@@ -128,6 +128,15 @@ def generate_plots(analyses):
     cut_loss_area_ideal = [row['cut_loss_area_ideal'] for row in analyses]
     bolt_width_used = [row['bolt_width_used'] for row in analyses]
     bolt_width_ideal = [row['bolt_width_ideal'] for row in analyses]
+
+    # make list of the needed scan data
+    abdomen_circ = [row['Abdomen Circum Tape Measure'] for row in scan_data]
+    chestbust_circ = [row['Chest / Bust Circum Tape Measure'] for row in scan_data]
+    hip_circ = [row['Hip Circum Tape Measure'] for row in scan_data]
+    seat_circ = [row['Seat Circum Tape Measure'] for row in scan_data]
+    stomach_circ = [row['Stomach Max Circum Tape Measure'] for row in scan_data]
+    waist_circ = [row['Waist Circum Tape Measure'] for row in scan_data]
+    height = [row['Height cm'] for row in scan_data]
 
     # Create a figure and a 2x2 grid of subplots
     fig, axs = plt.subplots(2, 2, figsize=(12, 10))
@@ -168,15 +177,68 @@ def generate_plots(analyses):
 
    # ----------------------------------------------------------------
 
-    # fig, axs = plt.subplots(3, 2, figsize=(12, 10))
+    fig, axs = plt.subplots(3, 2, figsize=(12, 10))
 
-    # axs[0, 0].scatter(ids, efficiency_used, label='Efficiency - Used')  # Used vs Ideal Eff
-    # axs[0, 0].scatter(ids, efficiency_ideal, label='Efficiency - Ideal')
-    # axs[0, 0].set_title('Efficiency values for Mendeley Participants')
-    # axs[0, 0].set_xlabel('Participant Scan Codes (IDs)')
-    # axs[0, 0].set_ylabel('Efficiencies')
-    # axs[0, 0].legend()
+    axs[0, 0].scatter(abdomen_circ, efficiency_used)
+    axs[0, 0].set_title('Efficiency(Used) vs Abdomen Circumference for Mendeley Participants')
+    axs[0, 0].set_xlabel('Abdomen Circumference (cm)')
+    axs[0, 0].set_ylabel('Efficiencies')
+    axs[0, 0].set_ylim([0.70, 1])
+    #axs[0, 0].legend()
 
+    axs[0, 1].scatter(chestbust_circ, efficiency_used)
+    axs[0, 1].set_title('Efficiency(Used) vs Chest/Bust Circumference for Mendeley Participants')
+    axs[0, 1].set_xlabel('Chest/Bust Circumference (cm)')
+    axs[0, 1].set_ylabel('Efficiencies')
+    axs[0, 1].set_ylim([0.70, 1])
+    #axs[0, 1].legend()
+
+    axs[1, 0].scatter(hip_circ, efficiency_used)
+    axs[1, 0].set_title('Efficiency(Used) vs Hip Circumference for Mendeley Participants')
+    axs[1, 0].set_xlabel('Hip Circumference (cm)')
+    axs[1, 0].set_ylabel('Efficiencies')
+    axs[1, 0].set_ylim([0.70, 1])
+    #axs[1, 0].legend()
+
+    axs[1, 1].scatter(seat_circ, efficiency_used)
+    axs[1, 1].set_title('Efficiency(Used) vs Seat Circumference for Mendeley Participants')
+    axs[1, 1].set_xlabel('Seat Circumference (cm)')
+    axs[1, 1].set_ylabel('Efficiencies')
+    axs[1, 1].set_ylim([0.70, 1])
+    #axs[1, 1].legend()
+
+    axs[2, 0].scatter(stomach_circ, efficiency_used)
+    axs[2, 0].set_title('Efficiency(Used) vs Stomach Circumference for Mendeley Participants')
+    axs[2, 0].set_xlabel('Stomach Circumference (cm)')
+    axs[2, 0].set_ylabel('Efficiencies')
+    axs[2, 0].set_ylim([0.70, 1])
+    #axs[2, 0].legend()
+
+    axs[2, 1].scatter(waist_circ, efficiency_used)
+    axs[2, 1].set_title('Efficiency(Used) vs Waist Circumference for Mendeley Participants')
+    axs[2, 1].set_xlabel('Waist Circumference (cm)')
+    axs[2, 1].set_ylabel('Efficiencies')
+    axs[2, 1].set_ylim([0.70, 1])
+    #axs[2, 1].legend()
+
+    plt.tight_layout()
+    plt.savefig('Bodice_Circ_Comparison.png')
+    plt.close()
+
+    # ----------------------------------------------------------------
+
+    fig, ax = plt.subplots(figsize=(12, 10))
+
+    ax.scatter(height, efficiency_used, color='red')
+    ax.set_title('Efficiency(Used) vs Height for Mendeley Participants')
+    ax.set_xlabel('Height (cm)')
+    ax.set_ylabel('Efficiencies')
+    ax.set_ylim([0.70, 1])
+    #ax.legend()
+
+    plt.tight_layout()
+    plt.savefig('Height_Comparison.png')
+    plt.close()
 
 def generate_bar_graphs(analyses):
     '''
@@ -258,7 +320,7 @@ def main():
     scan_data = read_mendeley_data()
     analyses = analyze_data(scan_data)
     analyses = add_pocket(analyses)
-    generate_plots(analyses)
+    generate_plots(analyses, scan_data)
     generate_bar_graphs(analyses)
 
     output_file = 'mendeleyScansAnalysis.csv'
