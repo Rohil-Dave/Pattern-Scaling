@@ -110,34 +110,54 @@ def generate_plots(analyses):
     # Create a figure and a 2x2 grid of subplots
     fig, axs = plt.subplots(2, 2, figsize=(12, 10))
 
+    # Bar width
+    bar_width = 0.35
+
+    # X positions
+    r1 = np.arange(len(ids))
+    r2 = [x + bar_width for x in r1]
+
     # Plot on each subplot
-    axs[0, 0].plot(ids, efficiency_used, label='Efficiency - Used')  # Used vs Ideal Eff
-    axs[0, 0].plot(ids, efficiency_ideal, label='Efficiency - Ideal')  
+    axs[0, 0].bar(r1, efficiency_used, width=bar_width, edgecolor='grey', label='Efficiency - Used')
+    axs[0, 0].bar(r2, efficiency_ideal, width=bar_width, edgecolor='grey', label='Efficiency - Ideal')
     axs[0, 0].set_title('Efficiency values for Workshop attendees', fontsize=14)
     axs[0, 0].set_xlabel('Identifiers', fontsize=12)
     axs[0, 0].set_ylabel('Efficiencies', fontsize=12)
-    axs[0, 0].legend()
+    axs[0, 0].set_xticks([r + bar_width / 2 for r in range(len(ids))])
+    axs[0, 0].set_xticklabels(ids)
+    axs[0, 0].set_ylim(0.7, 1.03)
+    axs[0, 0].legend(loc='upper right')
 
-    axs[0, 1].plot(ids, cut_loss_area_used, label='Cut Loss Area - Used')  # Used vs Ideal Cut Loss Area
-    axs[0, 1].plot(ids, cut_loss_area_ideal, label='Cut Loss Area - Ideal')  
-    axs[0, 1].set_title('Cut Loss Area for Workshop attendees', fontsize=14)
+    axs[0, 1].scatter(ids, bolt_width_used, label='Bolt Width - Used')  # Used vs Ideal Bolt Width
+    axs[0, 1].scatter(ids, bolt_width_ideal, label='Bolt Width - Ideal')  
+    # Adding vertical lines for the difference between used and ideal bolt width
+    for i in range(len(ids)):
+        axs[0, 1].plot([ids[i], ids[i]], [bolt_width_used[i], bolt_width_ideal[i]], color='gray', linestyle='--')
+        difference = int(abs(bolt_width_used[i] - bolt_width_ideal[i]))
+        axs[0, 1].annotate(f'Diff: {difference}', (ids[i], bolt_width_ideal[i]), textcoords="offset points", xytext=(0, -15), ha='center')
+    axs[0, 1].set_title('Bolt Width for Workshop attendees', fontsize=14)
     axs[0, 1].set_xlabel('Identifiers', fontsize=12)
-    axs[0, 1].set_ylabel('Cut Loss Area (cm$^2$)', fontsize=12)
-    axs[0, 1].legend()
+    axs[0, 1].set_ylabel('Bolt Width (cm)', fontsize=12)
+    axs[0, 1].set_ylim(116, 152)
+    axs[0, 1].legend(loc='lower right')
 
-    axs[1, 0].plot(ids, cut_loss_width_used, label='Cut Loss Width - Used')  # Used vs Ideal Cut Loss Width
-    axs[1, 0].plot(ids, cut_loss_width_ideal, label='Cut Loss Width - Ideal')  
+    axs[1, 0].bar(r1, cut_loss_width_used, width=bar_width, edgecolor='grey', label='Cut Loss Width - Used')  # Used vs Ideal Cut Loss Width
+    axs[1, 0].bar(r2, cut_loss_width_ideal, width=bar_width, edgecolor='grey', label='Cut Loss Width - Ideal')  
     axs[1, 0].set_title('Cut Loss Width for Workshop attendees', fontsize=14)
     axs[1, 0].set_xlabel('Identifiers', fontsize=12)
     axs[1, 0].set_ylabel('Cut Loss Width (cm)', fontsize=12)
-    axs[1, 0].legend()
+    axs[1, 0].set_xticks([r + bar_width / 2 for r in range(len(ids))])
+    axs[1, 0].set_xticklabels(ids)
+    axs[1, 0].legend(loc='upper right')
 
-    axs[1, 1].plot(ids, bolt_width_used, label='Bolt Width - Used')  # Used vs Ideal Bolt Width
-    axs[1, 1].plot(ids, bolt_width_ideal, label='Bolt Width - Ideal')  
-    axs[1, 1].set_title('Bolt Width for Workshop attendees', fontsize=14)
+    axs[1, 1].bar(r1, cut_loss_area_used, width=bar_width, edgecolor='grey', label='Cut Loss Area - Used')  # Used vs Ideal Cut Loss Area
+    axs[1, 1].bar(r2, cut_loss_area_ideal, width=bar_width, edgecolor='grey', label='Cut Loss Area - Ideal')  
+    axs[1, 1].set_title('Cut Loss Area for Workshop attendees', fontsize=14)
     axs[1, 1].set_xlabel('Identifiers', fontsize=12)
-    axs[1, 1].set_ylabel('Bolt Width (cm)', fontsize=12)
-    axs[1, 1].legend()
+    axs[1, 1].set_ylabel('Cut Loss Area (cm$^2$)', fontsize=12)
+    axs[1, 1].set_xticks([r + bar_width / 2 for r in range(len(ids))])
+    axs[1, 1].set_xticklabels(ids)
+    axs[1, 1].legend(loc='upper right')
 
     '''pyplot.plot(ids, efficiency_used)
     pyplot.plot(ids, efficiency_ideal)
