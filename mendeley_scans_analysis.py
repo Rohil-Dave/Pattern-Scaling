@@ -52,7 +52,7 @@ def calculate_pattern_width(row):
     # Step 2: Round up to the nearest 0.5cm
     max_bodice_circ = math.ceil(raw_max * 2) / 2
     # Step 3: Calculate the pattern width with ease and seam allowance
-    pattern_width = max_bodice_circ + 25 + 6 # add 25cm for ease (fixed for now) and 6cm for hem
+    pattern_width = max_bodice_circ + 25 + 6 # add 25cm for ease (fixed for now) and 6cm for seam
     return pattern_width
 
 def calculate_pattern_height(row):
@@ -179,42 +179,42 @@ def generate_plots(analyses, scan_data):
 
     fig, axs = plt.subplots(3, 2, figsize=(12, 10))
 
-    axs[0, 0].scatter(abdomen_circ, efficiency_used)
-    axs[0, 0].set_title('Efficiency(Used) vs Abdomen Circumference for Mendeley Participants')
+    axs[0, 0].scatter(abdomen_circ, efficiency_used) # Used Eff vs Ab Circ
+    axs[0, 0].set_title('Efficiency(Used) vs Abdomen Circumference for Mendeley Participants') 
     axs[0, 0].set_xlabel('Abdomen Circumference (cm)')
     axs[0, 0].set_ylabel('Efficiencies')
     axs[0, 0].set_ylim([0.70, 1])
     #axs[0, 0].legend()
 
-    axs[0, 1].scatter(chestbust_circ, efficiency_used)
-    axs[0, 1].set_title('Efficiency(Used) vs Chest/Bust Circumference for Mendeley Participants')
+    axs[0, 1].scatter(chestbust_circ, efficiency_used) # Used Eff vs Chest/Bust Circ
+    axs[0, 1].set_title('Efficiency(Used) vs Chest/Bust Circumference for Mendeley Participants') 
     axs[0, 1].set_xlabel('Chest/Bust Circumference (cm)')
     axs[0, 1].set_ylabel('Efficiencies')
     axs[0, 1].set_ylim([0.70, 1])
     #axs[0, 1].legend()
 
-    axs[1, 0].scatter(hip_circ, efficiency_used)
+    axs[1, 0].scatter(hip_circ, efficiency_used) # Used Eff vs Hip Circ
     axs[1, 0].set_title('Efficiency(Used) vs Hip Circumference for Mendeley Participants')
     axs[1, 0].set_xlabel('Hip Circumference (cm)')
     axs[1, 0].set_ylabel('Efficiencies')
     axs[1, 0].set_ylim([0.70, 1])
     #axs[1, 0].legend()
 
-    axs[1, 1].scatter(seat_circ, efficiency_used)
+    axs[1, 1].scatter(seat_circ, efficiency_used) # Used Eff vs Seat Circ
     axs[1, 1].set_title('Efficiency(Used) vs Seat Circumference for Mendeley Participants')
     axs[1, 1].set_xlabel('Seat Circumference (cm)')
     axs[1, 1].set_ylabel('Efficiencies')
     axs[1, 1].set_ylim([0.70, 1])
     #axs[1, 1].legend()
 
-    axs[2, 0].scatter(stomach_circ, efficiency_used)
+    axs[2, 0].scatter(stomach_circ, efficiency_used) # Used Eff vs Stomach Circ
     axs[2, 0].set_title('Efficiency(Used) vs Stomach Circumference for Mendeley Participants')
     axs[2, 0].set_xlabel('Stomach Circumference (cm)')
     axs[2, 0].set_ylabel('Efficiencies')
     axs[2, 0].set_ylim([0.70, 1])
     #axs[2, 0].legend()
 
-    axs[2, 1].scatter(waist_circ, efficiency_used)
+    axs[2, 1].scatter(waist_circ, efficiency_used) # Used Eff vs Waist Circ
     axs[2, 1].set_title('Efficiency(Used) vs Waist Circumference for Mendeley Participants')
     axs[2, 1].set_xlabel('Waist Circumference (cm)')
     axs[2, 1].set_ylabel('Efficiencies')
