@@ -64,6 +64,7 @@ def calculate_pattern_width(myscan_data):
     max_bodice_circ = math.ceil(raw_max * 2) / 2
     # Step 3: Calculate the pattern width with ease and seam allowance
     pattern_width = max_bodice_circ + 25 + 6 # add 25cm for ease (fixed for now) and 6cm for hem
+    print(pattern_width)
     return pattern_width
 
 def calculate_pattern_height(myscan_data):
@@ -86,6 +87,7 @@ def calculate_pattern_height(myscan_data):
     shirt_length = math.ceil(raw_shirt_length * 2) / 2
     # Step 3: Calculate pattern height with collar piece length and hem allowance
     pattern_height = shirt_length + 25 + 2.5 # add 6cm for hem and 2cm for collar piece
+    print(pattern_height)
     return pattern_height
     
 def main():
