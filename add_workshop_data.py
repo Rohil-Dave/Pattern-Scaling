@@ -118,7 +118,7 @@ def generate_plots(analyses):
     r2 = [x + bar_width for x in r1]
 
     # Plot on each subplot
-    axs[0, 0].bar(r1, efficiency_used, width=bar_width, edgecolor='grey', label='Efficiency - Used')
+    axs[0, 0].bar(r1, efficiency_used, width=bar_width, edgecolor='grey', label='Efficiency - Used') # Used vs Ideal Eff
     axs[0, 0].bar(r2, efficiency_ideal, width=bar_width, edgecolor='grey', label='Efficiency - Ideal')
     axs[0, 0].set_title('Efficiency values for Workshop attendees', fontsize=14)
     axs[0, 0].set_xlabel('Identifiers', fontsize=12)
@@ -175,9 +175,9 @@ def generate_plots(analyses):
     # Function to mask and plot data, removes None values for unfinished participants
     def plot_with_mask(ax, x, y, label):
         mask = [val is not None for val in y]
-        ax.plot([x[i] for i in range(len(x)) if mask[i]], 
+        ax.scatter([x[i] for i in range(len(x)) if mask[i]], 
                 [y[i] for i in range(len(y)) if mask[i]],
-                label=label, marker='o', ms=10)
+                label=label, s=50)
 
     # Plot each line with masking
     plot_with_mask(ax, ids, FG_bust_ease, 'Bust Ease')
