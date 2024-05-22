@@ -8,6 +8,8 @@ __email__ = 'rohil.dave20@imperial.ac.uk'
 
 import csv
 import math
+from matplotlib import pyplot as plt
+from matplotlib import ticker
 
 def calculate_ideal_bolt_width(width):
     '''
@@ -52,7 +54,7 @@ def calculate_pattern_width(row):
     # Step 3: Calculate the pattern width with ease and seam allowance
     pattern_width = max_bodice_circ + 25 + 6 # add 25cm for ease (fixed for now) and 6cm for hem
     return pattern_width
-    
+
 def calculate_pattern_height(row):
     '''
     Calculate the pattern height for a given scan, deriving center back neck height from
@@ -100,14 +102,112 @@ def analyze_data(scan_data):
             result['cut_loss_area_used'] = result['cut_loss_width_used'] * result['pattern_height']
             result['efficiency_used'] = 1 - result['cut_loss_area_used'] / (result['bolt_width_used'] * result['pattern_height'])
 
-        result['ideal_bolt_width'] = calculate_ideal_bolt_width(result['pattern_width'])
-        result['cut_loss_width_ideal'] = result['ideal_bolt_width'] - result['pattern_width']
+        result['bolt_width_ideal'] = calculate_ideal_bolt_width(result['pattern_width'])
+        result['cut_loss_width_ideal'] = result['bolt_width_ideal'] - result['pattern_width']
         result['cut_loss_area_ideal'] = result['cut_loss_width_ideal'] * result['pattern_height']
         result['efficiency_ideal'] = 1 - result['cut_loss_area_ideal'] \
-            / (result['ideal_bolt_width'] * result['pattern_height'])
+            / (result['bolt_width_ideal'] * result['pattern_height'])
         analyses.append(result)
 
+        analyses = sorted(analyses, key=lambda x : x['person_id'])
+
     return analyses
+
+def generate_plots(analyses):
+    '''
+    generate some plots of mendeley data analyses
+    '''
+
+    # make a list of the ids and values
+    ids = [row['person_id'] for row in analyses]
+    efficiency_used = [row['efficiency_used'] for row in analyses]
+    efficiency_ideal = [row['efficiency_ideal'] for row in analyses]
+    cut_loss_width_used = [row['cut_loss_width_used'] for row in analyses]
+    cut_loss_area_used = [row['cut_loss_area_used'] for row in analyses]
+    cut_loss_width_ideal = [row['cut_loss_width_ideal'] for row in analyses]
+    cut_loss_area_ideal = [row['cut_loss_area_ideal'] for row in analyses]
+    bolt_width_used = [row['bolt_width_used'] for row in analyses]
+    bolt_width_ideal = [row['bolt_width_ideal'] for row in analyses]
+
+    # Create a figure and a 2x2 grid of subplots
+    fig, axs = plt.subplots(2, 2, figsize=(12, 10))
+
+    # Plot on each subplot
+    axs[0, 0].plot(ids, efficiency_used, label='Efficiency_Used')  # First subplot
+    axs[0, 0].plot(ids, efficiency_ideal, label='Efficiency_Ideal')
+    axs[0, 0].set_title('Efficiency values for Mendeley Participants')
+    axs[0, 0].set_xlabel('Participant Ids')
+    axs[0, 0].set_ylabel('Efficiencies')
+    axs[0, 0].legend()
+
+    axs[0, 1].plot(ids, cut_loss_area_used, label='Cut_Loss_Area_Used')  # Second subplot
+    axs[0, 1].plot(ids, cut_loss_area_ideal, label='Cut_Loss_Area_Ideal')
+    axs[0, 1].set_title('Cut Loss Area for Mendeley Participants')
+    axs[0, 1].set_xlabel('Participant Ids')
+    axs[0, 1].set_ylabel('Cut Loss Area')
+    axs[0, 1].legend()
+
+    axs[1, 0].plot(ids, cut_loss_width_used, label='Cut_Loss_Width_Used')  # Third subplot
+    axs[1, 0].plot(ids, cut_loss_width_ideal, label='Cut_Loss_Width_Ideal')
+    axs[1, 0].set_title('Cut Loss Width for Mendeley Participants')
+    axs[1, 0].set_xlabel('Participant Ids')
+    axs[1, 0].set_ylabel('Cut Loss Width')
+    axs[1, 0].legend()
+
+    axs[1, 1].plot(ids, bolt_width_used, label='Bolt_Width_Used')  # Fourth subplot
+    axs[1, 1].plot(ids, bolt_width_ideal, label='Bolt_Width_Ideal')
+    axs[1, 1].set_title('Bolt Width for Mendeley Participants')
+    axs[1, 1].set_xlabel('Participant Ids')
+    axs[1, 1].set_ylabel('Bolt Width')
+    axs[1, 1].legend()
+
+    # Add some space between the plots
+    plt.tight_layout()
+    plt.savefig('Mendeley_Plot.png')
+    plt.close()
+
+def generate_bar_graphs(analyses):
+    '''
+    generate bar graphs for pattern fit for various bolt widths. we will try
+    6 different widths ranging from 110-160:10. for each width we will sort
+    how many participants could get the clothing pattern fit the bolt, either
+    regularly, or flipped. of the ones that do fit, see if there's enough for
+    embellishment
+    '''
+
+    categories = ['Regular layout', 'Flipped Layout', 'Embellished']
+    colors = ['lightblue', 'gray', 'teal']
+
+    fig, axs = plt.subplots(3, 2, figsize=(12, 10))
+    counter = 0
+    for bolt_width in range(110, 170, 10):
+        regular_fit = 0
+        flipped_fit = 0
+        embellished = 0
+        for row in analyses:
+            if row['pattern_width'] <= bolt_width:
+                regular_fit += 1
+                if bolt_width - row['pattern_width'] >= 11:
+                    embellished += 1
+            elif row['pattern_height'] <= bolt_width:
+                flipped_fit += 1
+                if bolt_width - row['pattern_height'] >= 11:
+                    embellished += 1
+        values = [regular_fit, flipped_fit, embellished]
+        axs_x = counter % 3
+        axs_y = int(counter / 3)
+        axs[axs_x, axs_y].bar(categories, values, width=0.25, color=colors)
+        axs[axs_x, axs_y].set_title('Distribution for Bolt width: ' + str(bolt_width))
+        axs[axs_x, axs_y].set_xlabel('Categories')
+        axs[axs_x, axs_y].set_ylabel('Count')
+        axs[axs_x, axs_y].set_ylim([0,105])
+        axs[axs_x, axs_y].yaxis.set_major_locator(ticker.MultipleLocator(5)) 
+        counter += 1
+
+    # Add some space between the plots
+    plt.tight_layout()
+    plt.savefig('Mendeley_Bar.png')
+    plt.close()
 
 def add_pocket(analyses):
     '''
@@ -137,8 +237,10 @@ def main():
     scan_data = read_mendeley_data()
     analyses = analyze_data(scan_data)
     analyses = add_pocket(analyses)
+    generate_plots(analyses)
+    generate_bar_graphs(analyses)
 
-    output_file = 'test.csv'
+    output_file = 'mendeleyScansAnalysis.csv'
     with open(output_file, mode='w', newline='') as file:
         writer = csv.DictWriter(file, fieldnames=analyses[0].keys())
 
