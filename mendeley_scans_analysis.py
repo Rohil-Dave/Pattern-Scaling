@@ -108,7 +108,7 @@ def analyze_data(scan_data):
         result['efficiency_ideal'] = 1 - result['cut_loss_area_ideal'] \
             / (result['bolt_width_ideal'] * result['pattern_height'])
         analyses.append(result)
-
+        # Sort by scan code in ascending order
         analyses = sorted(analyses, key=lambda x : x['person_id'])
 
     return analyses
@@ -175,7 +175,7 @@ def generate_plots(analyses, scan_data):
     plt.savefig('Mendeley_Plot.png')
     plt.close()
 
-   # ----------------------------------------------------------------
+    # ----------------------------------------------------------------
 
     fig, axs = plt.subplots(3, 2, figsize=(12, 10))
 
