@@ -9,6 +9,7 @@ __email__ = 'rohil.dave20@imperial.ac.uk'
 import csv
 from matplotlib import pyplot as plt
 import numpy as np
+import math
 
 def calculate_ideal_bolt_width(width):
     '''
@@ -63,6 +64,25 @@ def analyze_data(workshop_data):
         result['cut_loss_area_ideal'] = result['cut_loss_width_ideal'] * row['pattern_height']
         result['efficiency_ideal'] = 1 - result['cut_loss_area_ideal'] \
             / (result['bolt_width_ideal'] * row['pattern_height'])
+        
+        # # Calculate and assign theoretical ease values for the garment based on the pattern
+        # # Bodice: Straight "boxy" fit around torso means the theoretical ease for bodice circs equal to
+        # # subtracting the body measurement and sew tolerance from the pattern width (driven by largest circ)
+        # result['T_bust_ease']= row['pattern_width'] - row['sew_tolerance'] - row['bust_circ']
+        # result['T_waist_ease'] = row['pattern_width'] - row['sew_tolerance'] - row['waist_circ']
+        # # No theoretical hip ease if the shirt length is above the hip
+        # if row['shirt_above_hip'] == 1:
+        #     result['T_hip_ease'] = None
+        # else:
+        #     result['T_hip_ease'] = row['pattern_width'] - row['sew_tolerance'] - row['hip_circ']
+        # # Arm: Multiply calculated pattern armhole_length by two to get sleeve circumference and
+        # # subtract sew tolerance (2x 1cm), then subtract arm circ to get ease
+        # result['T_arm_ease'] = ((2 * row['armhole_length']) - 2) - row['arm_circ']
+        # # Shoulders: Take 2 halfs of the sleevehead curve approximated by straight line distance
+        # # between the minimum point of the curve and where the curve meets the horizontal. Add twice
+        # # the shoulder horizontal from the pattern and subtract the body shoulder width to get ease
+        # result['T_shoulder_ease'] = (2 * math.dist([0,0], [row['sleevehead_radius'], row['sleevehead_depth']])) + (2 * ((row['pattern_width'] - (4 * row['collar_width']) - (4 * row['sleevehead_radius'])) / 4))
+        
         
         # Calculate the ease for the finished garment, only for participants who finished
         if row['garment_finished'] == 1:
@@ -165,7 +185,7 @@ def generate_plots(analyses):
     plt.close()
 
     # ----------------------------------------------------------------
-    
+
     fig, ax = plt.subplots(figsize=(12, 10))
 
     # Function to mask and plot data, removes None values for unfinished participants
