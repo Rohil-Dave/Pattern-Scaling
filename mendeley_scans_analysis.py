@@ -177,7 +177,7 @@ def generate_plots(analyses, scan_data):
 
     # ----------------------------------------------------------------
 
-    fig, axs = plt.subplots(3, 2, figsize=(12, 10))
+    fig, axs = plt.subplots(3, 2, figsize=(15, 10))
 
     axs[0, 0].scatter(abdomen_circ, efficiency_used) # Used Eff vs Ab Circ
     axs[0, 0].set_title('Efficiency(Used) vs Abdomen Circumference for Mendeley Participants') 
@@ -230,7 +230,8 @@ def generate_plots(analyses, scan_data):
     fig, ax = plt.subplots(figsize=(12, 10))
 
     ax.scatter(height, efficiency_used, color='red')
-    ax.set_title('Efficiency(Used) vs Height for Mendeley Participants')
+    ax.scatter(height, efficiency_ideal, color='blue')
+    ax.set_title('Efficiency vs Height for Mendeley Participants')
     ax.set_xlabel('Height (cm)')
     ax.set_ylabel('Efficiencies')
     ax.set_ylim([0.70, 1])
