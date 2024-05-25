@@ -249,7 +249,7 @@ def generate_plots(analyses):
 
     # Create subplots for fit ratings
     fig, axs = plt.subplots(3, 2, figsize=(15, 15))
-    for i, area in enumerate(['bust', 'waist', 'arm', 'neck', 'shoulder']):
+    for i, area in enumerate(['bust', 'waist', 'hip', 'arm', 'neck', 'shoulder']):
         sns.regplot(x=f'FG_{area}_ease', y=f'fit_{area}', data=df_finished, ax=axs[i // 2, i % 2])
         axs[i // 2, i % 2].set_title(f'{area.capitalize()} Ease vs. Fit Rating')
         axs[i // 2, i % 2].set_xlabel(f'{area.capitalize()} Ease')
@@ -260,7 +260,7 @@ def generate_plots(analyses):
 
     # Create subplots for comfort ratings
     fig, axs = plt.subplots(3, 2, figsize=(15, 15))
-    for i, area in enumerate(['bust', 'waist', 'arm', 'neck', 'shoulder']):
+    for i, area in enumerate(['bust', 'waist', 'hip', 'arm', 'neck', 'shoulder']):
         sns.regplot(x=f'FG_{area}_ease', y=f'comfort_{area}', data=df_finished, ax=axs[i // 2, i % 2])
         axs[i // 2, i % 2].set_title(f'{area.capitalize()} Ease vs. Comfort Rating')
         axs[i // 2, i % 2].set_xlabel(f'{area.capitalize()} Ease')
@@ -268,6 +268,26 @@ def generate_plots(analyses):
     plt.tight_layout()
     plt.savefig('comfort_ratings.png')
     plt.close()
+
+    # Correlation heatmap for fit ratings
+    fit_columns = [f'fit_{area}' for area in ['bust', 'waist', 'hip', 'arm', 'neck', 'shoulder']]
+    ease_columns = [f'FG_{area}_ease' for area in ['bust', 'waist', 'hip', 'arm', 'neck', 'shoulder']]
+    fit_corr_matrix = df_finished[ease_columns + fit_columns].corr()
+
+    plt.figure(figsize=(12, 8))
+    sns.heatmap(fit_corr_matrix, annot=True, cmap='coolwarm')
+    plt.title('Correlation Heatmap between Ease and Fit Ratings')
+    plt.show()
+
+    # Correlation heatmap for comfort ratings
+    comfort_columns = [f'comfort_{area}' for area in ['bust', 'waist', 'hip', 'arm', 'neck', 'shoulder']]
+    comfort_corr_matrix = df_finished[ease_columns + comfort_columns].corr()
+
+    plt.figure(figsize=(12, 8))
+    sns.heatmap(comfort_corr_matrix, annot=True, cmap='coolwarm')
+    plt.title('Correlation Heatmap between Ease and Comfort Ratings')
+    plt.show()
+
 
 def main():
     '''
