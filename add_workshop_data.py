@@ -10,6 +10,8 @@ import csv
 from matplotlib import pyplot as plt
 import numpy as np
 import math
+import seaborn as sns
+import pandas as pd
 
 def calculate_ideal_bolt_width(width):
     '''
@@ -92,6 +94,19 @@ def analyze_data(workshop_data):
             result['FG_arm_ease'] = row['FG_arm_circ'] - row['arm_circ']
             result['FG_neck_ease'] = row['FG_neckline'] - row['neck_circ']
             result['FG_shoulder_ease'] = row['FG_shoulder_width'] - row['shoulder_width']
+
+            result['fit_bust'] = row['likert_fit_bust']
+            result['comfort_bust'] = row['likert_comfort_bust']
+            result['fit_waist'] = row['likert_fit_waist']
+            result['comfort_waist'] = row['likert_comfort_waist']
+            result['fit_hip'] = row['likert_fit_hips']
+            result['comfort_hip'] = row['likert_comfort_hips']
+            result['fit_arm'] = row['likert_fit_arms']
+            result['comfort_arm'] = row['likert_comfort_arms']
+            result['fit_neck'] = row['likert_fit_neck']
+            result['comfort_neck'] = row['likert_comfort_neck']
+            result['fit_shoulder'] = row['likert_fit_shoulders']
+            result['comfort_shoulder'] = row['likert_comfort_shoulders']
         else:
             result['FG_bust_ease'] = None
             result['FG_waist_ease'] = None
@@ -100,6 +115,19 @@ def analyze_data(workshop_data):
             result['FG_neck_ease'] = None
             result['FG_shoulder_ease'] = None
             # Not doing armhole ease because measurements were not consistently correctly taken
+
+            result['fit_bust'] = None
+            result['comfort_bust'] = None
+            result['fit_waist'] = None
+            result['comfort_waist'] = None
+            result['fit_hip'] = None
+            result['comfort_hip'] = None
+            result['fit_arm'] = None
+            result['comfort_arm'] = None
+            result['fit_neck'] = None
+            result['comfort_neck'] = None
+            result['fit_shoulder'] = None
+            result['comfort_shoulder'] = None
         # Apend values to the analyses list
         analyses.append(result)
 
@@ -210,6 +238,36 @@ def generate_plots(analyses):
     ax.legend()
 
     plt.savefig('FG_Ease_Plot.png')
+    plt.close()
+
+    # ----------------------------------------------------------------
+
+    df = pd.DataFrame(analyses)
+
+    # Filter out rows where garments were not finished
+    df_finished = df.dropna(subset=['FG_bust_ease'])
+
+    # Create subplots for fit ratings
+    fig, axs = plt.subplots(3, 2, figsize=(15, 15))
+    for i, area in enumerate(['bust', 'waist', 'arm', 'neck', 'shoulder']):
+        sns.regplot(x=f'FG_{area}_ease', y=f'fit_{area}', data=df_finished, ax=axs[i // 2, i % 2])
+        axs[i // 2, i % 2].set_title(f'{area.capitalize()} Ease vs. Fit Rating')
+        axs[i // 2, i % 2].set_xlabel(f'{area.capitalize()} Ease')
+        axs[i // 2, i % 2].set_ylabel(f'{area.capitalize()} Fit Rating')
+    plt.tight_layout()
+    plt.savefig('fit_ratings.png')
+    plt.close()
+
+    # Create subplots for comfort ratings
+    fig, axs = plt.subplots(3, 2, figsize=(15, 15))
+    for i, area in enumerate(['bust', 'waist', 'arm', 'neck', 'shoulder']):
+        sns.regplot(x=f'FG_{area}_ease', y=f'comfort_{area}', data=df_finished, ax=axs[i // 2, i % 2])
+        axs[i // 2, i % 2].set_title(f'{area.capitalize()} Ease vs. Comfort Rating')
+        axs[i // 2, i % 2].set_xlabel(f'{area.capitalize()} Ease')
+        axs[i // 2, i % 2].set_ylabel(f'{area.capitalize()} Comfort Rating')
+    plt.tight_layout()
+    plt.savefig('comfort_ratings.png')
+    plt.close()
 
 def main():
     '''
