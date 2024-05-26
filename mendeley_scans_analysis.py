@@ -10,6 +10,7 @@ import csv
 import math
 from matplotlib import pyplot as plt
 from matplotlib import ticker
+import ps_utils as psu
 
 def calculate_ideal_bolt_width(width):
     '''
@@ -48,7 +49,8 @@ def calculate_pattern_width(row):
     stomach_circ = row['Stomach Max Circum Tape Measure']
     waist_circ = row['Waist Circum Tape Measure']
     # Step 1: Find the largest circumference measurement
-    raw_max = max(abdomen_circ, axilla_circ, chestbust_circ, hip_circ, seat_circ, stomach_circ, waist_circ)
+    raw_max = max(abdomen_circ, axilla_circ, chestbust_circ, hip_circ, seat_circ, stomach_circ,
+        waist_circ)
     # Step 2: Round up to the nearest 0.5cm
     max_bodice_circ = math.ceil(raw_max * 2) / 2
     # Step 3: Calculate the pattern width with ease and seam allowance
@@ -93,14 +95,21 @@ def analyze_data(scan_data):
         result['pattern_height'] = calculate_pattern_height(row) # fixed now for testing purposes
         result['bolt_width_used'] = 150 # fixed now for testing purposes
 
-        if result['pattern_width'] > result['bolt_width_used']: # setting these to -1 for now
+        if result['pattern_width'] <= result['bolt_width_used']:
+            # pattern width fits the bolt
+            result['cut_loss_width_used'] = result['bolt_width_used'] - result['pattern_width']
+            result['cut_loss_area_used'] = result['cut_loss_width_used'] * result['pattern_height']
+            result['efficiency_used'] = result['pattern_width'] / result['bolt_width_used']
+        elif result['pattern_height'] <= result['bolt_width_used']:
+            # pattern height fits the bolt
+            result['cut_loss_width_used'] = result['bolt_width_used'] - result['pattern_height']
+            result['cut_loss_area_used'] = result['cut_loss_width_used'] * result['pattern_width']
+            result['efficiency_used'] = result['pattern_height'] / result['bolt_width_used']
+        else:
+            # leave this as -1 for now
             result['cut_loss_width_used'] = -1
             result['cut_loss_area_used'] = -1
             result['efficiency_used'] = -1
-        else:
-            result['cut_loss_width_used'] = result['bolt_width_used'] - result['pattern_width']
-            result['cut_loss_area_used'] = result['cut_loss_width_used'] * result['pattern_height']
-            result['efficiency_used'] = 1 - result['cut_loss_area_used'] / (result['bolt_width_used'] * result['pattern_height'])
 
         result['bolt_width_ideal'] = calculate_ideal_bolt_width(result['pattern_width'])
         result['cut_loss_width_ideal'] = result['bolt_width_ideal'] - result['pattern_width']
@@ -142,29 +151,33 @@ def generate_plots(analyses, scan_data):
     fig, axs = plt.subplots(2, 2, figsize=(12, 10))
 
     # Plot on each subplot
-    axs[0, 0].plot(ids, efficiency_used, label='Efficiency - Used')  # Used vs Ideal Eff
-    axs[0, 0].plot(ids, efficiency_ideal, label='Efficiency - Ideal')
+    # Used vs Ideal Eff
+    axs[0, 0].scatter(ids, efficiency_used, s=1, label='Efficiency - Used')
+    axs[0, 0].scatter(ids, efficiency_ideal, s=1, label='Efficiency - Ideal')
     axs[0, 0].set_title('Efficiency values for Mendeley Participants', fontsize=14)
     axs[0, 0].set_xlabel('Participant Scan Codes (IDs)', fontsize=12)
     axs[0, 0].set_ylabel('Efficiencies', fontsize=12)
     axs[0, 0].legend()
 
-    axs[0, 1].plot(ids, cut_loss_area_used, label='Cut Loss Area - Used')  # Used vs Ideal Cut Loss Area
-    axs[0, 1].plot(ids, cut_loss_area_ideal, label='Cut Loss Area - Ideal')
+    # Used vs Ideal Cut Loss Area
+    axs[0, 1].scatter(ids, cut_loss_area_used, s=1, label='Cut Loss Area - Used')
+    axs[0, 1].scatter(ids, cut_loss_area_ideal, s=1, label='Cut Loss Area - Ideal')
     axs[0, 1].set_title('Cut Loss Area for Mendeley Participants', fontsize=14)
     axs[0, 1].set_xlabel('Participant Scan Codes (IDs)', fontsize=12)
     axs[0, 1].set_ylabel('Cut Loss Area (cm$^2$)', fontsize=12)
     axs[0, 1].legend()
 
-    axs[1, 0].plot(ids, cut_loss_width_used, label='Cut Loss Width - Used')  # Used vs Ideal Cut Loss Width
-    axs[1, 0].plot(ids, cut_loss_width_ideal, label='Cut Loss Width - Ideal')
+    # Used vs Ideal Cut Loss Width
+    axs[1, 0].scatter(ids, cut_loss_width_used, s=1, label='Cut Loss Width - Used')
+    axs[1, 0].scatter(ids, cut_loss_width_ideal, s=1, label='Cut Loss Width - Ideal')
     axs[1, 0].set_title('Cut Loss Width for Mendeley Participants', fontsize=14)
     axs[1, 0].set_xlabel('Participant Scan Codes (IDs)', fontsize=12)
     axs[1, 0].set_ylabel('Cut Loss Width (cm)', fontsize=12)
     axs[1, 0].legend()
 
-    axs[1, 1].plot(ids, bolt_width_used, label='Bolt Width - Used')  # Used vs Ideal Bolt Width
-    axs[1, 1].plot(ids, bolt_width_ideal, label='Bolt Width - Ideal')
+    # Used vs Ideal Bolt Width
+    axs[1, 1].scatter(ids, bolt_width_used, s=1, label='Bolt Width - Used')
+    axs[1, 1].scatter(ids, bolt_width_ideal, s=1, label='Bolt Width - Ideal')
     axs[1, 1].set_title('Bolt Width for Mendeley Participants', fontsize=14)
     axs[1, 1].set_xlabel('Participant Scan Codes (IDs)', fontsize=12)
     axs[1, 1].set_ylabel('Bolt Width (cm)', fontsize=12)
@@ -180,14 +193,14 @@ def generate_plots(analyses, scan_data):
     fig, axs = plt.subplots(3, 2, figsize=(15, 10))
 
     axs[0, 0].scatter(abdomen_circ, efficiency_used) # Used Eff vs Ab Circ
-    axs[0, 0].set_title('Efficiency(Used) vs Abdomen Circumference for Mendeley Participants') 
+    axs[0, 0].set_title('Efficiency(Used) vs Abdomen Circumference for Mendeley Participants')
     axs[0, 0].set_xlabel('Abdomen Circumference (cm)')
     axs[0, 0].set_ylabel('Efficiencies')
     axs[0, 0].set_ylim([0.70, 1])
     #axs[0, 0].legend()
 
     axs[0, 1].scatter(chestbust_circ, efficiency_used) # Used Eff vs Chest/Bust Circ
-    axs[0, 1].set_title('Efficiency(Used) vs Chest/Bust Circumference for Mendeley Participants') 
+    axs[0, 1].set_title('Efficiency(Used) vs Chest/Bust Circumference for Mendeley Participants')
     axs[0, 1].set_xlabel('Chest/Bust Circumference (cm)')
     axs[0, 1].set_ylabel('Efficiencies')
     axs[0, 1].set_ylim([0.70, 1])
@@ -279,13 +292,13 @@ def generate_bar_graphs(analyses):
         axs[axs_x, axs_y].yaxis.set_major_locator(ticker.MultipleLocator(10))
         # Remove y-axis tick labels
         axs[axs_x, axs_y].set_yticklabels([])
-        
+
         # Create the bars and store them in the 'bars' variable
         bars = axs[axs_x, axs_y].bar(categories, values, width=0.25, color=colors)
         # Add counts on top of each bar
-        for bar, value in zip(bars, values):
-            axs[axs_x, axs_y].text(bar.get_x() + bar.get_width() / 2, bar.get_height(), str(value), 
-                                   ha='center', va='bottom')
+        for cur_bar, value in zip(bars, values):
+            axs[axs_x, axs_y].text(cur_bar.get_x() + cur_bar.get_width() / 2, cur_bar.get_height(),
+                 str(value), ha='center', va='bottom')
         counter += 1
 
     # Add some space between the plots
@@ -293,25 +306,6 @@ def generate_bar_graphs(analyses):
     plt.savefig('Mendeley_Bar.png')
     plt.close()
 
-def add_pocket(analyses):
-    '''
-    Checks if there is enough cut loss to add a pocket. Determines pocket size based 
-    on cut loss width. 
-    
-    Only considers pocket if pattern width is scaled to actual
-    body measurements and not to the ideal bolt width i.e. actual_measure == 1
-
-    We will set a constant finished pocket size of 10cm by 10cm for all users.
-    For this, seam allowances of 0.5cm are added to the side and bottom edges of the pocket,
-    and heam allowance of 2cm is added to the top edge of the pocket.
-    The pocket pattern piece then has dimensions of 11cm by 12.5cm.
-    '''
-    for row in analyses:
-        if row['cut_loss_width_used'] >= 11:
-            row['pocket_possible'] = 'Yes'
-        else:
-            row['pocket_possible'] = 'No'
-    return analyses
 
 def main():
     '''
@@ -320,9 +314,13 @@ def main():
 
     scan_data = read_mendeley_data()
     analyses = analyze_data(scan_data)
-    analyses = add_pocket(analyses)
+    analyses = psu.add_pocket(analyses)
     generate_plots(analyses, scan_data)
     generate_bar_graphs(analyses)
+    column_names = ['efficiency_used', 'efficiency_ideal', 'cut_loss_width_used',
+        'cut_loss_area_used', 'cut_loss_width_ideal', 'cut_loss_area_ideal', 
+        'bolt_width_ideal', 'embellished_saved']
+    psu.generate_box_plots(analyses, 'Mendeley', column_names)
 
     output_file = 'mendeleyScansAnalysis.csv'
     with open(output_file, mode='w', newline='') as file:
