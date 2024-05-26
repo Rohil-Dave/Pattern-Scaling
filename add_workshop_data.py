@@ -9,9 +9,9 @@ __email__ = 'rohil.dave20@imperial.ac.uk'
 import csv
 from matplotlib import pyplot as plt
 import numpy as np
-import math
 import seaborn as sns
 import pandas as pd
+import ps_utils as psu
 
 def calculate_ideal_bolt_width(width):
     '''
@@ -277,7 +277,8 @@ def generate_plots(analyses):
     plt.figure(figsize=(12, 8))
     sns.heatmap(fit_corr_matrix, annot=True, cmap='coolwarm')
     plt.title('Correlation Heatmap between Ease and Fit Ratings')
-    plt.show()
+    plt.savefig('corr_heat_ease_fit.png')
+    plt.close()
 
     # Correlation heatmap for comfort ratings
     comfort_columns = [f'comfort_{area}' for area in ['bust', 'waist', 'hip', 'arm', 'neck', 'shoulder']]
@@ -286,8 +287,8 @@ def generate_plots(analyses):
     plt.figure(figsize=(12, 8))
     sns.heatmap(comfort_corr_matrix, annot=True, cmap='coolwarm')
     plt.title('Correlation Heatmap between Ease and Comfort Ratings')
-    plt.show()
-
+    plt.savefig('corr_heat_ease_comfort.png')
+    plt.close()
 
 def main():
     '''
@@ -296,7 +297,13 @@ def main():
 
     workshop_data = read_workshop_data()
     analyses = analyze_data(workshop_data)
+    analyses = psu.add_pocket(analyses)
     generate_plots(analyses)
+    column_names = ['efficiency_used', 'efficiency_ideal', 'cut_loss_width_used',
+        'cut_loss_area_used', 'cut_loss_width_ideal', 'cut_loss_area_ideal', 
+        'bolt_width_ideal', 'embellished_saved']
+    psu.generate_box_plots(analyses, 'Workshop', column_names)
+
     
     output_file = 'ZWSworkshopAnalysis.csv'
     with open(output_file, mode='w', newline='') as file:
