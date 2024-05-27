@@ -1,41 +1,16 @@
 #!/usr/bin/env python3
 '''
-This module is used to add the fabric cut loss metrics and 
+This module is used to add the fabric cut loss metrics and
 fabric efficiency metrics to the ZWS workshop data file
 '''
 __author__ = 'Rohil J Dave'
 __email__ = 'rohil.dave20@imperial.ac.uk'
 
-import csv
 from matplotlib import pyplot as plt
 import numpy as np
 import seaborn as sns
 import pandas as pd
 import ps_utils as psu
-
-def calculate_ideal_bolt_width(width):
-    '''
-    Calculate the ideal bolt width for a given pattern width on boundaries of 5cm
-    '''
-    return width if width % 5 == 0 else width + 5 - width % 5
-
-def read_workshop_data():
-    '''
-    Read the data from the workshop, cast all numeric values correctly
-    '''
-    file_name = './ZWSworkshopData.csv'
-
-    workshop_data = []
-    with open(file_name, mode='r', newline='') as file:
-        csv_reader = csv.DictReader(file)
-        for row in csv_reader:
-            for key, value in row.items():
-                try:
-                    row[key] = float(value)
-                except ValueError:
-                    row[key] = value
-            workshop_data.append(row)
-    return workshop_data
 
 def analyze_data(workshop_data):
     '''
@@ -43,7 +18,7 @@ def analyze_data(workshop_data):
     ideal bolt width (within 5cm) and a bolt that we have (150cm). We will
     also indicate whether the off cuts can be used as embellishments, etc.
 
-    we can do more here like indicate what kinds of embellishments we can 
+    we can do more here like indicate what kinds of embellishments we can
     suggest given the off cut. If we define 'belt' and pocket geometry, we
     can recoup and increase the efficiency for given bolt width.
     '''
@@ -61,12 +36,8 @@ def analyze_data(workshop_data):
         result['cut_loss_area_used'] = result['cut_loss_width_used'] * row['pattern_height']
         result['efficiency_used'] = 1 - result['cut_loss_area_used'] / (row['bolt_width'] *
             row['pattern_height'])
-        result['bolt_width_ideal'] = calculate_ideal_bolt_width(row['pattern_width'])
-        result['cut_loss_width_ideal'] = result['bolt_width_ideal'] - row['pattern_width']
-        result['cut_loss_area_ideal'] = result['cut_loss_width_ideal'] * row['pattern_height']
-        result['efficiency_ideal'] = 1 - result['cut_loss_area_ideal'] \
-            / (result['bolt_width_ideal'] * row['pattern_height'])
-        
+        psu.assign_ideal_values(result)
+
         # # Calculate and assign theoretical ease values for the garment based on the pattern
         # # Bodice: Straight "boxy" fit around torso means the theoretical ease for bodice circs equal to
         # # subtracting the body measurement and sew tolerance from the pattern width (driven by largest circ)
@@ -84,8 +55,8 @@ def analyze_data(workshop_data):
         # # between the minimum point of the curve and where the curve meets the horizontal. Add twice
         # # the shoulder horizontal from the pattern and subtract the body shoulder width to get ease
         # result['T_shoulder_ease'] = (2 * math.dist([0,0], [row['sleevehead_radius'], row['sleevehead_depth']])) + (2 * ((row['pattern_width'] - (4 * row['collar_width']) - (4 * row['sleevehead_radius'])) / 4))
-        
-        
+
+
         # Calculate the ease for the finished garment, only for participants who finished
         if row['garment_finished'] == 1:
             result['FG_bust_ease'] = row['FG_bust_circ'] - row['bust_circ']
@@ -177,7 +148,7 @@ def generate_plots(analyses):
     axs[0, 0].legend(loc='upper right')
 
     axs[0, 1].scatter(ids, bolt_width_used, label='Bolt Width - Used')  # Used vs Ideal Bolt Width
-    axs[0, 1].scatter(ids, bolt_width_ideal, label='Bolt Width - Ideal')  
+    axs[0, 1].scatter(ids, bolt_width_ideal, label='Bolt Width - Ideal')
     # Adding vertical lines for the difference between used and ideal bolt width
     for i in range(len(ids)):
         axs[0, 1].plot([ids[i], ids[i]], [bolt_width_used[i], bolt_width_ideal[i]], color='gray', linestyle='--')
@@ -190,7 +161,7 @@ def generate_plots(analyses):
     axs[0, 1].legend(loc='lower right')
 
     axs[1, 0].bar(r1, cut_loss_width_used, width=bar_width, edgecolor='grey', label='Cut Loss Width - Used')  # Used vs Ideal Cut Loss Width
-    axs[1, 0].bar(r2, cut_loss_width_ideal, width=bar_width, edgecolor='grey', label='Cut Loss Width - Ideal')  
+    axs[1, 0].bar(r2, cut_loss_width_ideal, width=bar_width, edgecolor='grey', label='Cut Loss Width - Ideal')
     axs[1, 0].set_title('Cut Loss Width for Workshop attendees', fontsize=14)
     axs[1, 0].set_xlabel('Identifiers', fontsize=12)
     axs[1, 0].set_ylabel('Cut Loss Width (cm)', fontsize=12)
@@ -199,7 +170,7 @@ def generate_plots(analyses):
     axs[1, 0].legend(loc='upper right')
 
     axs[1, 1].bar(r1, cut_loss_area_used, width=bar_width, edgecolor='grey', label='Cut Loss Area - Used')  # Used vs Ideal Cut Loss Area
-    axs[1, 1].bar(r2, cut_loss_area_ideal, width=bar_width, edgecolor='grey', label='Cut Loss Area - Ideal')  
+    axs[1, 1].bar(r2, cut_loss_area_ideal, width=bar_width, edgecolor='grey', label='Cut Loss Area - Ideal')
     axs[1, 1].set_title('Cut Loss Area for Workshop attendees', fontsize=14)
     axs[1, 1].set_xlabel('Identifiers', fontsize=12)
     axs[1, 1].set_ylabel('Cut Loss Area (cm$^2$)', fontsize=12)
@@ -219,7 +190,7 @@ def generate_plots(analyses):
     # Function to mask and plot data, removes None values for unfinished participants
     def plot_with_mask(ax, x, y, label):
         mask = [val is not None for val in y]
-        ax.scatter([x[i] for i in range(len(x)) if mask[i]], 
+        ax.scatter([x[i] for i in range(len(x)) if mask[i]],
                 [y[i] for i in range(len(y)) if mask[i]],
                 label=label, s=50)
 
@@ -295,23 +266,16 @@ def main():
     the main routine to analyze workshop data
     '''
 
-    workshop_data = read_workshop_data()
+    workshop_data = psu.read_data('./ZWSworkshopData.csv')
     analyses = analyze_data(workshop_data)
     analyses = psu.add_pocket(analyses)
     generate_plots(analyses)
     column_names = ['efficiency_used', 'efficiency_ideal', 'cut_loss_width_used',
-        'cut_loss_area_used', 'cut_loss_width_ideal', 'cut_loss_area_ideal', 
+        'cut_loss_area_used', 'cut_loss_width_ideal', 'cut_loss_area_ideal',
         'bolt_width_ideal', 'embellished_saved']
     psu.generate_box_plots(analyses, 'Workshop', column_names)
 
-    
-    output_file = 'ZWSworkshopAnalysis.csv'
-    with open(output_file, mode='w', newline='') as file:
-        writer = csv.DictWriter(file, fieldnames=analyses[0].keys())
-
-        writer.writeheader()
-        for row in analyses:
-            writer.writerow(row)
+    psu.write_analyses('ZWSworkshopAnalysis.csv', analyses)
 
 # Execute main function
 if __name__ == "__main__":

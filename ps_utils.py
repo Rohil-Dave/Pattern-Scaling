@@ -5,8 +5,52 @@ Utilities for pattern scaling module
 __author__ = 'Rohil J Dave'
 __email__ = 'rohil.dave20@imperial.ac.uk'
 
+import csv
 import numpy as np
 import matplotlib.pyplot as plt
+
+def calculate_ideal_bolt_width(width):
+    '''
+    Calculate the ideal bolt width for a given pattern width on boundaries of 5cm
+    '''
+    return width if width % 5 == 0 else width + 5 - width % 5
+
+def read_data(file_name):
+    '''
+    Read the data from the saved file, cast all numeric values correctly
+    '''
+
+    file_data = []
+    with open(file_name, mode='r', newline='') as file:
+        csv_reader = csv.DictReader(file)
+        for row in csv_reader:
+            for key, value in row.items():
+                try:
+                    row[key] = float(value)
+                except ValueError:
+                    row[key] = value
+            file_data.append(row)
+    return file_data
+
+def write_analyses(file_name, analyses):
+    '''
+    write out the analyses as a csv file, given the analyses data
+    '''
+    with open(file_name, mode='w', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=analyses[0].keys())
+
+        writer.writeheader()
+        for row in analyses:
+            writer.writerow(row)
+
+def assign_ideal_values(result):
+    '''
+    compute and assign ideal values for a given set of measurements
+    '''
+    result['bolt_width_ideal'] = calculate_ideal_bolt_width(result['pattern_width'])
+    result['cut_loss_width_ideal'] = result['bolt_width_ideal'] - result['pattern_width']
+    result['cut_loss_area_ideal'] = result['cut_loss_width_ideal'] * result['pattern_height']
+    result['efficiency_ideal'] = result['pattern_width'] / result['bolt_width_ideal']
 
 def add_pocket(analyses):
     '''
@@ -38,7 +82,10 @@ def compute_stats(analyses, column_name):
     mean = np.mean(values)
     median = np.median(values)
     std_dev = np.std(values)
-    return mean, median, std_dev, values
+    print(column_name, "Mean:", mean)
+    #print(column_name, "Median:", median)
+    #print(column_name, "Standard Deviation:", std_dev)
+    return values
 
 def generate_box_plots(analyses, data_set, column_names):
     ''''
@@ -47,10 +94,7 @@ def generate_box_plots(analyses, data_set, column_names):
     '''
 
     for column_name in column_names:
-        mean, median, std_dev, values = compute_stats(analyses, column_name)
-        print(column_name, "Mean:", mean)
-        print(column_name, "Median:", median)
-        print(column_name, "Standard Deviation:", std_dev)
+        values = compute_stats(analyses, column_name)
 
         # Boxplot
         plt.boxplot(values)
@@ -59,3 +103,42 @@ def generate_box_plots(analyses, data_set, column_names):
         plt.xlabel(column_name)
         plt.savefig(f"{data_set}_{column_name}_Boxplot.png")
         plt.close()
+
+        plt.hist(values, bins=10, alpha=0.5)
+        plt.title(f"Histogram of '{data_set}' data '{column_name}' column")
+        plt.ylabel("Values")
+        plt.xlabel(column_name)
+        plt.savefig(f"{data_set}_{column_name}_Hist.png")
+        plt.close()
+
+def randomize_mendeley(instances=10):
+    '''
+    creates randomized instances from mendeley data. we only care about the columns we use in our
+    analysis
+    '''
+    column_names = ['Scan Code', 'Abdomen Circum Tape Measure', 'Chest / Bust Circum Tape Measure',
+        'Axilla Chest Circumference Tape Measure', 'Hip Circum Tape Measure', 'Waist Height', 
+        'Seat Circum Tape Measure', 'Stomach Max Circum Tape Measure', 'Waist Circum Tape Measure',
+        'Half Back Center Tape Measure', 'Crotch Height']
+    
+    # read the original file
+    original_data = read_data('./mendeleyScansData.csv')
+
+    for i in range(instances):
+        instance_data = []
+        for index in range(len(original_data)):
+            result = {}
+            for column_name in column_names:
+                rand_index = np.random.randint(0, len(original_data))
+                result[column_name] = original_data[rand_index][column_name]
+            instance_data.append(result)
+        write_analyses(f'mendeley_{i}_of_{instances}.csv', instance_data)
+
+def main():
+    '''
+    write out mendeley randomized files
+    '''
+    randomize_mendeley(10)
+
+if __name__ == '__main__':
+    main()

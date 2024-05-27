@@ -6,35 +6,11 @@ fabric efficiency metrics of the 100 scan Mendeley data file
 __author__ = 'Rohil J Dave'
 __email__ = 'rohil.dave20@imperial.ac.uk'
 
-import csv
 import math
 from matplotlib import pyplot as plt
 from matplotlib import ticker
+#from sklearn.linear_model import LinearRegression
 import ps_utils as psu
-
-def calculate_ideal_bolt_width(width):
-    '''
-    Calculate the ideal bolt width for a given pattern width on boundaries of 5cm
-    '''
-    return width if width % 5 == 0 else width + 5 - width % 5
-
-def read_mendeley_data():
-    '''
-    Read the data from the workshop, cast all numeric values correctly
-    '''
-    file_name = './mendeleyScansData.csv'
-
-    scan_data = []
-    with open(file_name, mode='r', newline='') as file:
-        csv_reader = csv.DictReader(file)
-        for row in csv_reader:
-            for key, value in row.items():
-                try:
-                    row[key] = float(value)
-                except ValueError:
-                    row[key] = value
-            scan_data.append(row)
-    return scan_data
 
 def calculate_pattern_width(row):
     '''
@@ -55,7 +31,7 @@ def calculate_pattern_width(row):
     max_bodice_circ = math.ceil(raw_max * 2) / 2
     # Step 3: Calculate the pattern width with ease and seam allowance
     pattern_width = max_bodice_circ + 25 + 6 # add 25cm for ease (fixed for now) and 6cm for seam
-    return pattern_width
+    return max_bodice_circ, pattern_width
 
 def calculate_pattern_height(row):
     '''
@@ -74,6 +50,29 @@ def calculate_pattern_height(row):
     pattern_height = shirt_length + 25 + 2.5 # add 6cm for hem and 2cm for collar piece
     return pattern_height
 
+def bolt_width_based_calculations(result, bolt_width=150):
+    '''
+    Set the bolt width (default 150, but could be anything from 100:170:10)
+    Based on the bolt width compute cut loss and efficiency values
+    '''
+    result['bolt_width_used'] = bolt_width
+
+    if result['pattern_width'] <= result['bolt_width_used']:
+        # pattern width fits the bolt
+        result['cut_loss_width_used'] = result['bolt_width_used'] - result['pattern_width']
+        result['cut_loss_area_used'] = result['cut_loss_width_used'] * result['pattern_height']
+        result['efficiency_used'] = result['pattern_width'] / result['bolt_width_used']
+    elif result['pattern_height'] <= result['bolt_width_used']:
+        # pattern height fits the bolt
+        result['cut_loss_width_used'] = result['bolt_width_used'] - result['pattern_height']
+        result['cut_loss_area_used'] = result['cut_loss_width_used'] * result['pattern_width']
+        result['efficiency_used'] = result['pattern_height'] / result['bolt_width_used']
+    else:
+        # leave this as -1 for now
+        result['cut_loss_width_used'] = -1
+        result['cut_loss_area_used'] = -1
+        result['efficiency_used'] = -1
+
 def analyze_data(scan_data):
     '''
     we are going to compute the cut loss width, area, and efficiency for an
@@ -91,31 +90,11 @@ def analyze_data(scan_data):
     for row in scan_data:
         result = {}
         result['person_id'] = row['Scan Code'] # use scan code as unqiue identifier
-        result['pattern_width'] = calculate_pattern_width(row)
+        result['max_circ'], result['pattern_width'] = calculate_pattern_width(row)
         result['pattern_height'] = calculate_pattern_height(row) # fixed now for testing purposes
-        result['bolt_width_used'] = 150 # fixed now for testing purposes
+        bolt_width_based_calculations(result, 150)
 
-        if result['pattern_width'] <= result['bolt_width_used']:
-            # pattern width fits the bolt
-            result['cut_loss_width_used'] = result['bolt_width_used'] - result['pattern_width']
-            result['cut_loss_area_used'] = result['cut_loss_width_used'] * result['pattern_height']
-            result['efficiency_used'] = result['pattern_width'] / result['bolt_width_used']
-        elif result['pattern_height'] <= result['bolt_width_used']:
-            # pattern height fits the bolt
-            result['cut_loss_width_used'] = result['bolt_width_used'] - result['pattern_height']
-            result['cut_loss_area_used'] = result['cut_loss_width_used'] * result['pattern_width']
-            result['efficiency_used'] = result['pattern_height'] / result['bolt_width_used']
-        else:
-            # leave this as -1 for now
-            result['cut_loss_width_used'] = -1
-            result['cut_loss_area_used'] = -1
-            result['efficiency_used'] = -1
-
-        result['bolt_width_ideal'] = calculate_ideal_bolt_width(result['pattern_width'])
-        result['cut_loss_width_ideal'] = result['bolt_width_ideal'] - result['pattern_width']
-        result['cut_loss_area_ideal'] = result['cut_loss_width_ideal'] * result['pattern_height']
-        result['efficiency_ideal'] = 1 - result['cut_loss_area_ideal'] \
-            / (result['bolt_width_ideal'] * result['pattern_height'])
+        psu.assign_ideal_values(result)
         analyses.append(result)
         # Sort by scan code in ascending order
         analyses = sorted(analyses, key=lambda x : x['person_id'])
@@ -306,29 +285,45 @@ def generate_bar_graphs(analyses):
     plt.savefig('Mendeley_Bar.png')
     plt.close()
 
+# def regression_analysis(analyses):
+#     '''
+#     Run regression analysis to see what is the impact of various values on efficiency
+#     '''
+#     X = [[row['max_circ'], row['bolt_width_used']] for row in analyses]
+#     y = [row['efficiency_used'] for row in analyses]
+#     # Instantiate the linear regression model
+#     model = LinearRegression()
+
+#     # Fit the model to the data
+#     model.fit(X, y)
+
+#     # Print the coefficients and intercept
+#     print("Coefficients:", model.coef_)
+#     print("Intercept:", model.intercept_)
 
 def main():
     '''
     the main routine to analyze 100 scan Mendeley data
     '''
-
-    scan_data = read_mendeley_data()
+    scan_data = psu.read_data('./mendeleyScansData.csv')
     analyses = analyze_data(scan_data)
     analyses = psu.add_pocket(analyses)
     generate_plots(analyses, scan_data)
     generate_bar_graphs(analyses)
-    column_names = ['efficiency_used', 'efficiency_ideal', 'cut_loss_width_used',
-        'cut_loss_area_used', 'cut_loss_width_ideal', 'cut_loss_area_ideal', 
-        'bolt_width_ideal', 'embellished_saved']
+    column_names = ['efficiency_ideal', 'cut_loss_width_ideal', 'cut_loss_area_ideal',
+        'bolt_width_ideal', 'max_circ']
     psu.generate_box_plots(analyses, 'Mendeley', column_names)
+    #regression_analysis(analyses)
+    psu.write_analyses('mendeleyScansAnalysis.csv', analyses)
 
-    output_file = 'mendeleyScansAnalysis.csv'
-    with open(output_file, mode='w', newline='') as file:
-        writer = csv.DictWriter(file, fieldnames=analyses[0].keys())
-
-        writer.writeheader()
-        for row in analyses:
-            writer.writerow(row)
+    # see if a choice of bolt widths fits this population better
+    for bolt_width in range(110, 170, 5):
+        print(f'\nFor bolt width {bolt_width}')
+        for result in analyses:
+            bolt_width_based_calculations(result, bolt_width)
+            analyses = psu.add_pocket(analyses)
+        column_names = ['efficiency_used', 'cut_loss_area_used']
+        psu.generate_box_plots(analyses, f'Mendeley_{bolt_width}', column_names)
 
 # Execute main function
 if __name__ == "__main__":
