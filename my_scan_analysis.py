@@ -8,6 +8,7 @@ __email__ = 'rohil.dave20@imperial.ac.uk'
 
 import csv
 import math
+import layered_dxf_pattern as ldp
 
 def calculate_ideal_bolt_width(width):
     '''
@@ -90,14 +91,29 @@ def calculate_pattern_height(myscan_data):
     print(pattern_height)
     return pattern_height
     
+    
 def main():
     '''
     the main routine to analyze my scan data
     '''
 
     myscan_data = read_myscan_data()
-    calculate_pattern_width(myscan_data)
-    calculate_pattern_height(myscan_data)
+   
+    p_measurements = {}
+    p_measurements['person_id'] = 'ROHIL_scan'
+    p_measurements['ease'] = 25 # currently fixed
+    p_measurements['sew_tolerance'] = 6 # FIXED FOR ALL BODIES
+    p_measurements['collar_width'] = 9.5 # FIXED FOR ALL BODIES
+    p_measurements['collar_length'] = 25 # FIXED FOR ALL BODIES
+    p_measurements['sleevehead_depth'] = 3.5
+    p_measurements['sleevehead_radius'] = 14
+    p_measurements['b5_width'] = 14
+    p_measurements['pattern_height'] = calculate_pattern_height(myscan_data)
+    p_measurements['pattern_width'] = calculate_pattern_width(myscan_data)
+    
+    ldp.draw_layered_pattern_dxf(p_measurements)
+    ldp.draw_pdf_with_dimensions(p_measurements)
+    
 
 # Execute main function
 if __name__ == "__main__":
