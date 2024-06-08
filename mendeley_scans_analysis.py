@@ -48,9 +48,9 @@ def calculate_pattern_height(row):
     shirt_length = math.ceil(raw_shirt_length * 2) / 2
     # Step 3: Calculate pattern height with collar piece length and hem allowance
     pattern_height = shirt_length + 25 + 2.5 # add 6cm for hem and 2cm for collar piece
-    return pattern_height
+    return shirt_length, pattern_height
 
-def bolt_width_based_calculations(result, bolt_width=150):
+def bolt_width_based_calculations(result, bolt_width=150, append=False):
     '''
     Set the bolt width (default 150, but could be anything from 100:170:10)
     Based on the bolt width compute cut loss and efficiency values
@@ -72,6 +72,11 @@ def bolt_width_based_calculations(result, bolt_width=150):
         result['cut_loss_width_used'] = -1
         result['cut_loss_area_used'] = -1
         result['efficiency_used'] = -1
+    if append:
+        result[f'cut_loss_width_used_{bolt_width}'] = result['cut_loss_width_used']
+        result[f'cut_loss_area_used_{bolt_width}'] = result['cut_loss_area_used']
+        result[f'efficiency_used_{bolt_width}'] = result['efficiency_used']
+
 
 def analyze_data(scan_data):
     '''
@@ -91,8 +96,9 @@ def analyze_data(scan_data):
         result = {}
         result['person_id'] = row['Scan Code'] # use scan code as unqiue identifier
         result['max_circ'], result['pattern_width'] = calculate_pattern_width(row)
-        result['pattern_height'] = calculate_pattern_height(row) # fixed now for testing purposes
-        bolt_width_based_calculations(result, 150)
+        result['shirt_length'], result['pattern_height'] = calculate_pattern_height(row) # fixed now for testing purposes
+        #result['shirt_length'] = result['pattern_height']
+        bolt_width_based_calculations(result, 150, False)
 
         psu.assign_ideal_values(result)
         analyses.append(result)
@@ -164,7 +170,7 @@ def generate_plots(analyses, scan_data):
 
     # Add some space between the plots
     plt.tight_layout()
-    plt.savefig('Mendeley_Plot.png')
+    plt.savefig('./images/Mendeley_Plot.png')
     plt.close()
 
     # ----------------------------------------------------------------
@@ -214,7 +220,7 @@ def generate_plots(analyses, scan_data):
     #axs[2, 1].legend()
 
     plt.tight_layout()
-    plt.savefig('Bodice_Circ_Comparison.png')
+    plt.savefig('./images/Bodice_Circ_Comparison.png')
     plt.close()
 
     # ----------------------------------------------------------------
@@ -230,7 +236,7 @@ def generate_plots(analyses, scan_data):
     #ax.legend()
 
     plt.tight_layout()
-    plt.savefig('Height_Comparison.png')
+    plt.savefig('./images/Height_Comparison.png')
     plt.close()
 
 def generate_bar_graphs(analyses):
@@ -242,7 +248,7 @@ def generate_bar_graphs(analyses):
     embellishment
     '''
 
-    categories = ['Regular Layout', 'Flipped Layout', 'Embellished']
+    categories = ['Regular Layout', 'Rotated Layout', 'Embellished']
     colors = ['lightblue', 'teal', 'maroon']
 
     fig, axs = plt.subplots(3, 2, figsize=(12, 10))
@@ -282,7 +288,7 @@ def generate_bar_graphs(analyses):
 
     # Add some space between the plots
     plt.tight_layout()
-    plt.savefig('Mendeley_Bar.png')
+    plt.savefig('./images/Mendeley_Bar.png')
     plt.close()
 
 # def regression_analysis(analyses):
@@ -310,8 +316,8 @@ def main():
     analyses = psu.add_pocket(analyses)
     generate_plots(analyses, scan_data)
     generate_bar_graphs(analyses)
-    column_names = ['efficiency_ideal', 'cut_loss_width_ideal', 'cut_loss_area_ideal',
-        'bolt_width_ideal', 'max_circ']
+    column_names = [('efficiency_ideal', '(decimal fraction)'), ('cut_loss_width_ideal', '(cm)'),
+        ('cut_loss_area_ideal', '(cm$2$)'), ('bolt_width_ideal', '(cm)'), ('max_circ', '(cm)'), ('shirt_length', '(cm)')]
     psu.generate_box_plots(analyses, 'Mendeley', column_names)
     #regression_analysis(analyses)
     psu.write_analyses('mendeleyScansAnalysis.csv', analyses)
@@ -320,10 +326,26 @@ def main():
     for bolt_width in range(110, 170, 5):
         print(f'\nFor bolt width {bolt_width}')
         for result in analyses:
-            bolt_width_based_calculations(result, bolt_width)
-            analyses = psu.add_pocket(analyses)
-        column_names = ['efficiency_used', 'cut_loss_area_used']
+            bolt_width_based_calculations(result, bolt_width, True)
+            analyses = psu.add_pocket(analyses, bolt_width, True)
+        column_names = [('efficiency_used', '(decimal fraction)'), ('cut_loss_area_used', '(cm$2$)'), ('embellished_saved', '(decimal fraction)')]
         psu.generate_box_plots(analyses, f'Mendeley_{bolt_width}', column_names)
+
+    
+    psu.generate_combo_box_plots(analyses, 'Mendeley Multiple bolts Cut Loss Area', 
+        ['cut_loss_area_used_110', 'cut_loss_area_used_115', 'cut_loss_area_used_120', 'cut_loss_area_used_125', 
+        'cut_loss_area_used_130', 'cut_loss_area_used_135', 'cut_loss_area_used_140', 'cut_loss_area_used_145', 
+        'cut_loss_area_used_150', 'cut_loss_area_used_155', 'cut_loss_area_used_160', 'cut_loss_area_used_165'], '(cm$2$)')
+
+    psu.generate_combo_box_plots(analyses, 'Mendeley Multiple bolts Embellished', 
+        ['embellished_saved_110', 'embellished_saved_115', 'embellished_saved_120', 'embellished_saved_125', 
+        'embellished_saved_130', 'embellished_saved_135', 'embellished_saved_140', 'embellished_saved_145', 
+        'embellished_saved_150', 'embellished_saved_155', 'embellished_saved_160', 'embellished_saved_165'], '(Decimal Fraction)')
+
+    psu.generate_combo_box_plots(analyses, 'Mendeley Multiple bolts Efficiency', 
+        ['efficiency_used_110', 'efficiency_used_115', 'efficiency_used_120', 'efficiency_used_125', 
+        'efficiency_used_130', 'efficiency_used_135', 'efficiency_used_140', 'efficiency_used_145', 
+        'efficiency_used_150', 'efficiency_used_155', 'efficiency_used_160', 'efficiency_used_165'], '(Decimal Fraction)')
 
 # Execute main function
 if __name__ == "__main__":

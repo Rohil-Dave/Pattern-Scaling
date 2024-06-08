@@ -9,6 +9,8 @@ import csv
 import numpy as np
 import matplotlib.pyplot as plt
 
+IMG_DIR = './images/'
+
 def calculate_ideal_bolt_width(width):
     '''
     Calculate the ideal bolt width for a given pattern width on boundaries of 5cm
@@ -52,7 +54,7 @@ def assign_ideal_values(result):
     result['cut_loss_area_ideal'] = result['cut_loss_width_ideal'] * result['pattern_height']
     result['efficiency_ideal'] = result['pattern_width'] / result['bolt_width_ideal']
 
-def add_pocket(analyses):
+def add_pocket(analyses, bolt_width=150, append=False):
     '''
     Checks if there is enough cut loss to add a pocket. Determines pocket size based 
     on cut loss width. 
@@ -72,6 +74,8 @@ def add_pocket(analyses):
         else:
             row['pocket_possible'] = False
             row['embellished_saved'] = 0.0
+        if append:
+            row[f'embellished_saved_{bolt_width}'] = row['embellished_saved']
     return analyses
 
 def compute_stats(analyses, column_name):
@@ -83,8 +87,8 @@ def compute_stats(analyses, column_name):
     median = np.median(values)
     std_dev = np.std(values)
     print(column_name, "Mean:", mean)
-    #print(column_name, "Median:", median)
-    #print(column_name, "Standard Deviation:", std_dev)
+    print(column_name, "Median:", median)
+    print(column_name, "Standard Deviation:", std_dev)
     return values
 
 def generate_box_plots(analyses, data_set, column_names):
@@ -93,22 +97,23 @@ def generate_box_plots(analyses, data_set, column_names):
     print stats as well
     '''
 
-    for column_name in column_names:
+    for (column_name, unit_type) in column_names:
         values = compute_stats(analyses, column_name)
+        cap_name = capitalize_underscore_text(column_name)
 
         # Boxplot
-        plt.boxplot(values)
-        plt.title(f"Boxplot of '{data_set}' data '{column_name}' column")
-        plt.ylabel("Values")
-        plt.xlabel(column_name)
-        plt.savefig(f"{data_set}_{column_name}_Boxplot.png")
+        plt.boxplot(values, showmeans=True)
+        #plt.title(f"{data_set} {column_name}")
+        plt.ylabel(f'{data_set} {cap_name} {unit_type}', fontsize=12)
+        plt.xlabel(cap_name, fontsize=12)
+        plt.savefig(f"{IMG_DIR}{data_set}_{column_name}_Boxplot.png", dpi=600)
         plt.close()
 
         plt.hist(values, bins=10, alpha=0.5)
-        plt.title(f"Histogram of '{data_set}' data '{column_name}' column")
-        plt.ylabel("Values")
-        plt.xlabel(column_name)
-        plt.savefig(f"{data_set}_{column_name}_Hist.png")
+        #plt.title(f"{data_set} {column_name}")
+        plt.ylabel(f'{data_set} {cap_name} Distribution', fontsize=12)
+        plt.xlabel(cap_name, fontsize=12)
+        plt.savefig(f"{IMG_DIR}{data_set}_{column_name}_Hist.png", dpi=600)
         plt.close()
 
 def randomize_mendeley(instances=10):
@@ -133,6 +138,37 @@ def randomize_mendeley(instances=10):
                 result[column_name] = original_data[rand_index][column_name]
             instance_data.append(result)
         write_analyses(f'mendeley_{i}_of_{instances}.csv', instance_data)
+
+def capitalize_underscore_text(text):
+    # Step 1: Split the text by underscores
+    words = text.split('_')
+    
+    # Step 2: Capitalize each word
+    capitalized_words = [word.capitalize() for word in words]
+    
+    # Step 3: Join the words back together
+    capitalized_text = ' '.join(capitalized_words)
+    
+    return capitalized_words[-1]
+    return capitalized_text
+
+def generate_combo_box_plots(analyses, plot_header, column_names, unit_type):
+    '''
+    generate group box plots for the given columns
+    '''
+    vals_list = []
+    col_labels = []
+    for column_name in column_names:
+        values = [row[column_name] for row in analyses if column_name in row]
+        vals_list.append(values)
+        col_labels.append(capitalize_underscore_text(column_name))
+    plt.boxplot(vals_list, showmeans=True)
+    #plt.title(plot_header)
+    plt.ylabel(f'{plot_header} {unit_type}', fontsize=12)
+    x_ticks = [x + 1 for x in range(len(column_names))]
+    plt.xticks(x_ticks, labels=col_labels, fontsize=12)
+    plt.savefig(f"{IMG_DIR}{plot_header}_Boxplot.png", dpi=600)
+    plt.close()
 
 def main():
     '''
